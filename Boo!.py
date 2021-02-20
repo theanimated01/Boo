@@ -68,7 +68,7 @@ async def hi(ctx, mem : discord.Member=None):
 
 @client.command()
 async def command(ctx):
-    await ctx.send('hi, hello, hey, ping, 8ball, clear, delete')
+    await ctx.send('hi, hello, hey, ping, 8ball, clear, delete, prefix')
 
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
@@ -86,7 +86,7 @@ async def clear(ctx, amount=1):
 @client.command()
 async def idjot(ctx, mem : discord.Member):
     await ctx.send(f'{mem.mention} is an IDJOT!')
-    await ctx.send(f'<:KEKW:795870448549101568>')
+    #await ctx.send(f'<:KEKW:795870448549101568>')
     
 
 client.run(str(os.environ.get('token')))
