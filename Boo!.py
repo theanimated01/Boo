@@ -67,7 +67,7 @@ async def hi(ctx, mem : discord.Member=None):
         await ctx.send(f'Hello IDJOT! {mem.mention}')
 
 @client.command()
-async def command(ctx):
+async def help(ctx):
     await ctx.send('hi, hello, hey, ping, 8ball, clear, delete, prefix')
 
 @client.command(aliases=['8ball'])
