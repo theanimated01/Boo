@@ -88,4 +88,4 @@ async def idjot(ctx, mem : discord.Member):
     await ctx.send(f'<:KEKW:795870448549101568>')
     
 
-client.run('ODA5NDY5MTA1Nzg5OTkzMDMy.YCVi2g.RCoZimnkGvTbZALtXj8-L8W225c')
+client.run(process.env.token)
