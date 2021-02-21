@@ -67,8 +67,13 @@ async def hi(ctx, mem : discord.Member=None):
         await ctx.send(f'Hello IDJOT! {mem.mention}')
 
 @client.command()
-async def command(ctx):
-    await ctx.send('hi, hello, hey, ping, 8ball, clear, delete, prefix')
+async def luv(ctx, mem : discord.Member=None):
+    if mem==None:
+        await ctx.send('Spreading luv to everyone in the server')
+        await.ctx.send(f'<:pinqhairluv:810930016002375701>')
+    else:
+        await.ctx.send(f'You have sent luv to {mem.mention}')
+        await.ctx.send('<:pinqhairluv:810930016002375701>')
 
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
