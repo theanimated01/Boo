@@ -60,20 +60,20 @@ async def ping(ctx):
     await ctx.send(f'{round(client.latency * 1000)}ms')
 
 @client.command(aliases=['hey','hello'])
-async def hi(ctx, mem : discord.Member=None):
+async def hi(ctx, mem=None):
     if mem==None:
         await ctx.send(f'Hello IDJOT!')
     else:
-        await ctx.send(f'Hello IDJOT! {mem.mention}')
+        await ctx.send(f'Hello IDJOT! {mem}')
 
-#@client.command()
-#async def luv(ctx, mem : discord.Member=None):
-#    if mem==None:
-#        await ctx.send('Spreading luv to everyone in the server')
-#        await.ctx.send(f'<:pinqhairluv:810930016002375701>')
-#    else:
-#        await.ctx.send(f'You have sent luv to {mem.mention}')
-#        await.ctx.send('<:pinqhairluv:810930016002375701>')
+@client.command()
+async def luv(ctx, mem=None):
+    if mem == None:
+        await ctx.send('Spreading luv to everyone in the server')
+        await ctx.send(f'<:pinqhairluv:810930016002375701>')
+    else:
+        await ctx.send(f'You have sent luv to {mem}')
+        await ctx.send('<:pinqhairluv:810930016002375701>')
 
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
@@ -89,9 +89,12 @@ async def clear(ctx, amount=1):
     await ctx.send(f'Successfully deleted {amount} message')
 
 @client.command()
-async def idjot(ctx, mem : discord.Member):
-    await ctx.send(f'{mem.mention} is an IDJOT!')
-    #await ctx.send(f'<:KEKW:795870448549101568>')
+async def idjot(ctx, mem=None):
+    if mem==None:
+        await ctx.send('You are an IDJOT!')
+        #await ctx.send(f'<:KEKW:795870448549101568>')
+    else:
+        await ctx.send(f'{mem} is an IDJOT!')
     
 
 client.run(str(os.environ.get('token')))
