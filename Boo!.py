@@ -12,10 +12,12 @@ def get_prefix(client, message):
 
 
 client = commands.Bot(command_prefix = get_prefix)
+client.remove_command('help')
 
 @client.event
 async def on_ready():
-    print('Bot is ready')
+    await client.change_presence(activity=discord.Game('-help'))
+    
 
 @client.event
 async def on_guild_join(guild):
@@ -55,6 +57,25 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('Missing argument, please try again with all required arguments')
 
+@client.command()
+async def help(ctx):
+
+    embed = discord.Embed(
+        color= discord.Color.purple()
+    )
+
+    embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
+    embed.set_author(name='HELP', icon_url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
+    embed.add_field(name='ping', value='gives the ping of the bot', inline=False)
+    embed.add_field(name='prefix', value='can be used to change prefix of bot (can be used by administrators only)', inline=False)
+    embed.add_field(name='hi', value='just says hi, or maybe try mentioning someone ;)', inline=False)
+    embed.add_field(name='luv', value='spread luv in the server or to a specific person', inline=False)
+    embed.add_field(name='8ball', value='just your standard 8ball', inline=False)
+    embed.add_field(name='clear', value='clears a particular amount of messages. (must have manage message permission)', inline=False)
+    embed.add_field(name='idjot', value='Your standard idjot command to call someone an IDJOT. kekw', inline=False)
+
+    await ctx.send(embed=embed)
+ 
 @client.command()
 async def ping(ctx):
     await ctx.send(f'{round(client.latency * 1000)}ms')
