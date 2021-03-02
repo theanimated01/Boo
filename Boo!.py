@@ -3,6 +3,7 @@ import json
 import random
 import youtube_dl
 import requests
+import os
 from discord.ext import commands
 from discord.utils import get
 from discord import FFmpegPCMAudio
@@ -260,5 +261,5 @@ async def skip(ctx):
 
 
 queue = []
-client.run('ODEyOTYwODI3NDQ3MzEyMzk0.YDIWxQ.fxlT8rVHu--XXMovOXrryUwAkBw')
+client.run(str(os.environ.get('token'))
 
