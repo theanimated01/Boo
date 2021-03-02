@@ -5,4 +5,3 @@ PyNaCl
 youtube_dl
 requests
 discord.py[FFmpegPCMAudio]
-asyncio
