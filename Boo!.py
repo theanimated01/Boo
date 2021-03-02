@@ -249,17 +249,22 @@ async def resume(ctx):
 async def skip(ctx):
 
     voice = get(client.voice_clients, guild=ctx.guild)
-    if len(queue) == 0:
-        await ctx.send('No song in queue to skip to')
+    role = discord.utils.get(ctx.guild.roles, name='DJ')
+    print(ctx.author.roles)
+    if role in ctx.author.roles:
+        if len(queue) == 0:
+            await ctx.send('No song in queue to skip to. Stopped the one currently playing')
+            voice.stop()
+        else:
+            next_song = queue.pop(0)
+            video, source = search(next_song)
+            voice.stop()
+            await ctx.send('**Skipped** :thumbsup:')
+            await ctx.send(f'Playing :notes: `{video["title"]}` - Now!')
+            voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
+            voice.is_playing()
     else:
-
-        next_song = queue.pop(0)
-        video, source = search(next_song)
-        voice.stop()
-        await ctx.send('**Skipped** :thumbsup:')
-        await ctx.send(f'Playing :notes: `{video["title"]}` - Now!')
-        voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
-        voice.is_playing()
+        await ctx.send("Can't skip song as you do not have the DJ role")
 
 
 queue = []
