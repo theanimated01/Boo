@@ -4,6 +4,8 @@ import random
 import youtube_dl
 import requests
 import os
+import ctypes
+import ctypes.util
 from discord.ext import commands
 from discord.utils import get
 from discord import FFmpegPCMAudio
@@ -248,7 +250,7 @@ async def skip(ctx):
 
     voice = get(client.voice_clients, guild=ctx.guild)
     if len(queue) == 0:
-        pass
+        await ctx.send('No song in queue to skip to')
     else:
 
         next_song = queue.pop(0)
