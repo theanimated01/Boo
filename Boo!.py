@@ -263,5 +263,5 @@ async def skip(ctx):
 
 
 queue = []
-client.run(str(os.environ.get('token'))
+client.run(str(os.environ.get('token')))
 
