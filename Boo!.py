@@ -50,6 +50,17 @@ async def on_guild_remove(guild):
         json.dump(prefixes, f)
 
 
+@client.command()
+@commands.has_permissions(administrator=True)
+async def prefix(ctx, prefix):
+    with open('Prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+    prefixes[str(ctx.guild.id)] = prefix
+    with open('Prefixes.json', 'w') as f:
+        json.dump(prefixes, f)
+    await ctx.send(f'Successfully changed prefix to {prefix} !')
+    
+    
 @client.event
 async def on_member_join(member):
     with open('users.json', 'r') as f:
