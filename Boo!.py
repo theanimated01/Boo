@@ -406,6 +406,18 @@ async def skip(ctx):
         await ctx.send("Can't skip song as you do not have the DJ role")
 
 
+@client.command(aliases=['view'])
+async def viewq(ctx):
+
+    embed = discord.Embed(
+        color=discord.Color.dark_gray()
+    )
+    embed.set_author(name='QUEUE')
+    for i in range(0, len(queue)):
+        embed.add_field(name='Song ' + str(i+1), value=queue[i], inline=False)
+
+    await ctx.send(embed=embed)
+
 queue = []
 client.run(str(os.environ.get('token')))
 
