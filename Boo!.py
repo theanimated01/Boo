@@ -112,7 +112,6 @@ async def rank(ctx, member: discord.Member = None):
             users = json.load(f)
         lvl = str(users[str(id_1)]['level'])
         exp = str(users[str(id_1)]['experience'])
-        await ctx.send(f'You are at level {lvl}!')
 
         bg = Image.open('Rank Card.png')
         asset = ctx.author.avatar_url_as(size=128)
@@ -154,7 +153,6 @@ async def rank(ctx, member: discord.Member = None):
             users = json.load(f)
         lvl = users[str(id_1)]['level']
         exp = str(users[str(id_1)]['experience'])
-        await ctx.send(f'{member} is at level {lvl}!')
 
         bg = Image.open('Rank Card.png')
         asset = member.avatar_url_as(size=128)
@@ -173,17 +171,19 @@ async def rank(ctx, member: discord.Member = None):
         draw.text((790, 140), exp, (127, 131, 132), font=f2)
         draw.text((270, 120), name, (255, 255, 255), font=f3)
 
-        experience = users[str(id_1)]['experience']
         lvl_start = users[str(id_1)]['level']
-        lvl_end = (experience ** (1 / 6))
-        perc = (lvl_end / (lvl_start + 1)) * 100
-        rectangle1 = Image.open('rect.png')
+        req_xp_for_lvl = ((lvl_start+1) ** 6)
+        temp_exp = users[str(id_1)]['temp_exp']
+        perc = (temp_exp/req_xp_for_lvl)*100
         rectangle2 = Image.open('rect_bg.png')
-        rectangle1 = rectangle1.resize((round(626 * perc / 100), 35))
         rectangle2 = rectangle2.resize((630, 35))
 
         bg.paste(rectangle2, (255, 185))
-        bg.paste(rectangle1, (255, 185))
+
+        if perc > 0:
+            rectangle1 = Image.open('rect.png')
+            rectangle1 = rectangle1.resize((round(626 * perc/100), 35))
+            bg.paste(rectangle1, (255, 185))
 
         bg.save('rank.png')
         await ctx.send(file=discord.File('rank.png'))
