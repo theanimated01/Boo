@@ -4,8 +4,9 @@ import random
 import youtube_dl
 import requests
 import os
-import ctypes
-import ctypes.util
+import time
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
 from discord.ext import commands
 from discord.utils import get
 from discord import FFmpegPCMAudio
@@ -49,18 +50,143 @@ async def on_guild_remove(guild):
         json.dump(prefixes, f)
 
 
+@client.event
+async def on_member_join(member):
+    with open('users.json', 'r') as f:
+        users = json.load(f)
+
+    await update_data(users, member)
+
+    with open('users.json', 'w') as f:
+        json.dump(users, f)
+
+
+@client.event
+async def on_message(message):
+    if not message.author.bot:
+        with open('users.json', 'r') as f:
+            users = json.load(f)
+
+        exp = random.randrange(15,  26)
+        await update_data(users, message.author)
+        await add_experience(users, message.author, exp)
+        await level_up(users, message.author, message)
+
+        with open('users.json', 'w') as f:
+            json.dump(users, f)
+
+    await client.process_commands(message)
+
+
+async def update_data(users, user):
+    if f'{user.id}' not in users:
+        users[f'{user.id}'] = {}
+        users[f'{user.id}']['experience'] = 0
+        users[f'{user.id}']['level'] = 1
+        users[f'{user.id}']["last_message"] = 0
+        users[f'{user.id}']['temp_exp'] = 0
+
+
+async def add_experience(users, user, exp):
+    if time.time() - users[f'{user.id}']["last_message"] > 60:
+        users[f'{user.id}']['experience'] += exp
+        users[f'{user.id}']['temp_exp'] += exp
+        users[f'{user.id}']['last_message'] = time.time()
+
+
+async def level_up(users, user, message):
+    experience = users[f'{user.id}']['experience']
+    lvl_start = users[f'{user.id}']['level']
+    lvl_end = int(experience ** (1 / 6))
+    if lvl_start < lvl_end:
+        await message.channel.send(f'{user.mention} has leveled up to level {lvl_end}')
+        users[f'{user.id}']['level'] = lvl_end
+        users[f'{user.id}']['temp_exp'] = 0
+
+
 @client.command()
-@commands.has_permissions(administrator=True)
-async def prefix(ctx, prefix):
-    with open('Prefixes.json', 'r') as f:
-        prefixes = json.load(f)
+async def rank(ctx, member: discord.Member = None):
+    if not member:
+        id_1 = ctx.message.author.id
+        with open('users.json', 'r') as f:
+            users = json.load(f)
+        lvl = str(users[str(id_1)]['level'])
+        exp = str(users[str(id_1)]['experience'])
+        await ctx.send(f'You are at level {lvl}!')
 
-    prefixes[str(ctx.guild.id)] = prefix
+        bg = Image.open('Rank Card.png')
+        asset = ctx.author.avatar_url_as(size=128)
+        data = BytesIO(await asset.read())
+        pfp = Image.open(data)
+        pfp = pfp.resize((135, 135))
 
-    with open('Prefixes.json', 'w') as f:
-        json.dump(prefixes, f)
+        bg.paste(pfp, (70, 70))
 
-    await ctx.send(f'Successfully changed prefix to {prefix} !')
+        draw = ImageDraw.Draw(bg)
+        name = str(ctx.message.author)
+        f1 = ImageFont.truetype('cour.ttf', 65)
+        f2 = ImageFont.truetype('arial.ttf', 28)
+        f3 = ImageFont.truetype('arial.ttf', 35)
+        draw.text((850, 45), lvl, (98, 211, 245), font=f1)
+        draw.text((790, 140), exp, (127, 131, 132), font=f2)
+        draw.text((270, 120), name, (255, 255, 255), font=f3)
+
+
+        lvl_start = users[str(id_1)]['level']
+        req_xp_for_lvl = ((lvl_start+1) ** 6)
+        temp_exp = users[str(id_1)]['temp_exp']
+        perc = (temp_exp/req_xp_for_lvl)*100
+        rectangle2 = Image.open('rect_bg.png')
+        rectangle2 = rectangle2.resize((630, 35))
+
+        bg.paste(rectangle2, (255, 185))
+
+        if perc > 0:
+            rectangle1 = Image.open('rect.png')
+            rectangle1 = rectangle1.resize((round(626 * perc/100), 35))
+            bg.paste(rectangle1, (255, 185))
+
+        bg.save('rank.png')
+        await ctx.send(file=discord.File('rank.png'))
+    else:
+        id_1 = member.id
+        with open('users.json', 'r') as f:
+            users = json.load(f)
+        lvl = users[str(id_1)]['level']
+        exp = str(users[str(id_1)]['experience'])
+        await ctx.send(f'{member} is at level {lvl}!')
+
+        bg = Image.open('Rank Card.png')
+        asset = member.avatar_url_as(size=128)
+        data = BytesIO(await asset.read())
+        pfp = Image.open(data)
+        pfp = pfp.resize((135, 135))
+
+        bg.paste(pfp, (70, 70))
+
+        draw = ImageDraw.Draw(bg)
+        name = str(member)
+        f1 = ImageFont.truetype('cour.ttf', 65)
+        f2 = ImageFont.truetype('arial.ttf', 28)
+        f3 = ImageFont.truetype('arial.ttf', 35)
+        draw.text((850, 45), lvl, (98, 211, 245), font=f1)
+        draw.text((790, 140), exp, (127, 131, 132), font=f2)
+        draw.text((270, 120), name, (255, 255, 255), font=f3)
+
+        experience = users[str(id_1)]['experience']
+        lvl_start = users[str(id_1)]['level']
+        lvl_end = (experience ** (1 / 6))
+        perc = (lvl_end / (lvl_start + 1)) * 100
+        rectangle1 = Image.open('rect.png')
+        rectangle2 = Image.open('rect_bg.png')
+        rectangle1 = rectangle1.resize((round(626 * perc / 100), 35))
+        rectangle2 = rectangle2.resize((630, 35))
+
+        bg.paste(rectangle2, (255, 185))
+        bg.paste(rectangle1, (255, 185))
+
+        bg.save('rank.png')
+        await ctx.send(file=discord.File('rank.png'))
 
 
 @client.event
@@ -133,6 +259,7 @@ async def clear(ctx, amount=1):
 
 
 @client.command()
+@commands.cooldown(1, 30, commands.BucketType.user)
 async def idjot(ctx, mem=None):
     if mem == None:
         await ctx.send(f'You are an IDJOT!')
