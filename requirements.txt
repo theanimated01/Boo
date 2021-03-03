@@ -3,6 +3,7 @@ discord.py[voice]
 ffmpeg
 PyNaCl
 youtube_dl
+pillow
 requests
 discord.py[FFmpegPCMAudio]
 colorlog
