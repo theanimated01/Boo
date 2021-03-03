@@ -340,7 +340,7 @@ async def play(ctx, *, url):
 def check_queue():
 
     voice = get(client.voice_clients)
-    if len(queue) == 0:
+    if len(queue) <= 0:
         pass
     else:
         next_song = queue.pop(0)
@@ -356,14 +356,6 @@ async def queue(ctx, *, url):
     video, source = search(url)
     await ctx.send(f'Found `{video["title"]}` :thumbsup:')
     queue.append(video['title'])
-
-    embed = discord.Embed(
-        color=discord.Color.dark_gray()
-    )
-    embed.set_author(name='Added to queue')
-    embed.add_field(name='Name', value=queue[0])
-
-    await ctx.send(embed=embed)
 
 
 @client.command(aliases=['pa'])
@@ -383,7 +375,7 @@ async def resume(ctx):
         voice.resume()
         await ctx.send('**Resuming** :play_pause:')
 
-
+                   
 @client.command(aliases=['s'])
 async def skip(ctx):
 
@@ -391,11 +383,11 @@ async def skip(ctx):
     role = discord.utils.get(ctx.guild.roles, name='DJ')
     print(ctx.author.roles)
     if role in ctx.author.roles:
-        if len(queue) == 0:
+        if len(queue) <= 0:
             await ctx.send('No song in queue to skip to. Stopped the one currently playing')
             voice.stop()
         else:
-            next_song = queue.pop(0)
+            next_song = queue[0]
             video, source = search(next_song)
             voice.stop()
             await ctx.send('**Skipped** :thumbsup:')
