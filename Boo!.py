@@ -61,7 +61,7 @@ async def prefix(ctx, prefix):
     await ctx.send(f'Successfully changed prefix to {prefix} !')
     
     
-@client.event
+'''@client.event
 async def on_member_join(member):
     with open('users.json', 'r') as f:
         users = json.load(f)
@@ -197,7 +197,7 @@ async def rank(ctx, member: discord.Member = None):
             bg.paste(rectangle1, (255, 185))
 
         bg.save('rank.png')
-        await ctx.send(file=discord.File('rank.png'))
+        await ctx.send(file=discord.File('rank.png'))'''
 
 
 @client.event
@@ -224,11 +224,12 @@ async def help(ctx):
     embed.add_field(name='idjot', value='Your standard idjot command to call someone an IDJOT. kekw', inline=False)
     embed.add_field(name='play or p', value='Plays a song (does not work with spotify yet)', inline=False)
     embed.add_field(name='queue or q', value='Add a song to queue', inline=False)
+    embed.add_field(name='view', value='Shows the queue', inline=False)
     embed.add_field(name='pause or pa', value='Pauses the song currently playing', inline=False)
     embed.add_field(name='resume or r', value='Resumes the song currently playing', inline=False)
     embed.add_field(name='skip or s', value='Skips the song playing and plays next song in queue', inline=False)
     embed.add_field(name='leave or disconnect or dc', value='Disconnects the bot from VC', inline=False)
-    embed.add_field(name='rank', value='Gives your rank card', inline=False)
+    embed.add_field(name='rank', value='Gives your rank card (Temporarily down)', inline=False)
 
     await ctx.send(embed=embed)
 
@@ -351,11 +352,14 @@ def check_queue():
 
 @client.command(aliases=['q'])
 async def queue(ctx, *, url):
-
-    await ctx.send(f'Searching: :mag_right: `{url}`')
-    video, source = search(url)
-    await ctx.send(f'Found `{video["title"]}` :thumbsup:')
-    queue.append(video['title'])
+                       
+    if voice.is_connected():
+        await ctx.send(f'Searching: :mag_right: `{url}`')
+        video, source = search(url)
+        await ctx.send(f'Found `{video["title"]}` :thumbsup:')
+        queue.append(video['title'])
+    else:
+        await ctx.send('Not in a voice channel')
 
 
 @client.command(aliases=['pa'])
