@@ -339,7 +339,7 @@ async def play(ctx, *, url):
 
 
 def check_queue():
-
+                           
     voice = get(client.voice_clients)
     if len(queue) <= 0:
         pass
@@ -352,7 +352,7 @@ def check_queue():
 
 @client.command(aliases=['q'])
 async def queue(ctx, *, url):
-                       
+    voice = get(client.voice_clients, guild=ctx.guild)                         
     if voice.is_connected():
         await ctx.send(f'Searching: :mag_right: `{url}`')
         video, source = search(url)
