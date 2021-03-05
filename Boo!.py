@@ -5,6 +5,7 @@ import youtube_dl
 import requests
 import os
 import time
+import sqlite3
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from discord.ext import commands
