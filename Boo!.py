@@ -72,12 +72,18 @@ async def on_message(message):
         await update_data(message.author)
         await add_experience(message.author, exp)
         await level_up(message.author, message)
+        print('all functions called')
 
     await client.process_commands(message)
 
 
 async def update_data(user):
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    
+    try:
+        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    except mysql.connector.error as err:
+        print(err)
+        
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}"')
     result = cursor.fetchone()
@@ -86,11 +92,15 @@ async def update_data(user):
         val = (user.id, 0, 1, 0, 0)
         cursor.execute(sql, val)
         db.commit()
+        print('update_data works')
 
 
 async def add_experience(user, exp):
 
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    try:
+        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    except mysql.connector.error as err:
+        print(err)
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}"')
     result = cursor.fetchone()
@@ -105,11 +115,15 @@ async def add_experience(user, exp):
         val = (xp, temp_exp, last_msg, user.id)
         cursor.execute(sql, val)
         db.commit()
-
+        print('add_exp works')
+    
 
 async def level_up(user, message):
 
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    try:
+        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    except mysql.connector.error as err:
+        print(err)
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}"')
     result = cursor.fetchone()
@@ -125,6 +139,7 @@ async def level_up(user, message):
         val = (temp_exp, level, user.id)
         cursor.execute(sql, val)
         db.commit()
+        print('level_up works')
 
 
 @client.command()
