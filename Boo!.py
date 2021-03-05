@@ -92,7 +92,7 @@ async def update_data(user):
         val = (user.id, 0, 1, 0, 0)
         cursor.execute(sql, val)
         db.commit()
-        print('update_data works')
+    print('update_data works')
 
 
 async def add_experience(user, exp):
@@ -115,7 +115,7 @@ async def add_experience(user, exp):
         val = (xp, temp_exp, last_msg, user.id)
         cursor.execute(sql, val)
         db.commit()
-        print('add_exp works')
+    print('add_exp works')
     
 
 async def level_up(user, message):
@@ -139,7 +139,7 @@ async def level_up(user, message):
         val = (temp_exp, level, user.id)
         cursor.execute(sql, val)
         db.commit()
-        print('level_up works')
+    print('level_up works')
 
 
 @client.command()
