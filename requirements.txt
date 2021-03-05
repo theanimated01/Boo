@@ -7,3 +7,4 @@ pillow
 requests
 discord.py[FFmpegPCMAudio]
 colorlog
+mysql.connector
