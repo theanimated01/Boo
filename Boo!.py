@@ -89,7 +89,7 @@ async def update_data(user):
     result = cursor.fetchone()
     if result is None:
         sql = (f'INSERT INTO users(user_id, exp, level, last_msg, temp_exp) VALUES(%s, %s, %s, %s, %s)')
-        val = (user.id, 0, 1, 0, 0)
+        val = (int(user.id), 0, 1, 0, 0)
         cursor.execute(sql, val)
         db.commit()
     print('update_data works')
@@ -112,7 +112,7 @@ async def add_experience(user, exp):
         temp_exp += exp
         last_msg = time.time()
         sql = 'UPDATE users SET exp = %s, temp_exp = %s, last_msg = %s WHERE user_id = %s'
-        val = (xp, temp_exp, last_msg, user.id)
+        val = (xp, temp_exp, last_msg, int(user.id))
         cursor.execute(sql, val)
         db.commit()
     print('add_exp works')
@@ -136,7 +136,7 @@ async def level_up(user, message):
         level = level_end
         temp_exp = 0
         sql = 'UPDATE users SET temp_exp = %s, level = %s WHERE user_id = %s'
-        val = (temp_exp, level, user.id)
+        val = (temp_exp, level, int(user.id))
         cursor.execute(sql, val)
         db.commit()
     print('level_up works')
