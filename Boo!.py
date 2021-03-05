@@ -25,6 +25,7 @@ client.remove_command('help')
 
 @client.event
 async def on_ready():
+    mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     await client.change_presence(activity=discord.Game('-help'))
     print('Bot is ready')
 
@@ -82,7 +83,7 @@ async def update_data(user):
     result = cursor.fetchone()
     if result is None:
         sql = (f'INSERT INTO users(user_id, exp, level, last_msg, temp_exp) VALUES(%s, %s, %s, %s, %s)')
-        val = (int(user.id), 0, 1, 0, 0)
+        val = (user.id, 0, 1, 0, 0)
         cursor.execute(sql, val)
         db.commit()
 
