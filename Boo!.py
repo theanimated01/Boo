@@ -61,68 +61,83 @@ async def prefix(ctx, prefix):
     await ctx.send(f'Successfully changed prefix to {prefix} !')
     
     
-'''@client.event
-async def on_member_join(member):
-    with open('users.json', 'r') as f:
-        users = json.load(f)
-
-    await update_data(users, member)
-
-    with open('users.json', 'w') as f:
-        json.dump(users, f)
-
-
 @client.event
 async def on_message(message):
+
     if not message.author.bot:
-        with open('users.json', 'r') as f:
-            users = json.load(f)
 
         exp = random.randrange(15,  26)
-        await update_data(users, message.author)
-        await add_experience(users, message.author, exp)
-        await level_up(users, message.author, message)
-
-        with open('users.json', 'w') as f:
-            json.dump(users, f)
+        await update_data( message.author)
+        await add_experience(message.author, exp)
+        await level_up(message.author, message)
 
     await client.process_commands(message)
 
 
-async def update_data(users, user):
-    if f'{user.id}' not in users:
-        users[f'{user.id}'] = {}
-        users[f'{user.id}']['experience'] = 0
-        users[f'{user.id}']['level'] = 1
-        users[f'{user.id}']["last_message"] = 0
-        users[f'{user.id}']['temp_exp'] = 0
+async def update_data(user):
+    db = sqlite3.connect('users.db')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}"')
+    result = cursor.fetchone()
+    if result is None:
+        sql = (f'INSERT INTO users(user_id, exp, level, last_msg, temp_exp) VALUES(?,?,?,?,?)')
+        val = (int(user.id), 0, 1, 0, 0)
+        cursor.execute(sql, val)
+        db.commit()
 
 
-async def add_experience(users, user, exp):
-    if time.time() - users[f'{user.id}']["last_message"] > 60:
-        users[f'{user.id}']['experience'] += exp
-        users[f'{user.id}']['temp_exp'] += exp
-        users[f'{user.id}']['last_message'] = time.time()
+async def add_experience(user, exp):
+
+    db = sqlite3.connect('users.db')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}"')
+    result = cursor.fetchone()
+    xp = result[0]
+    last_msg = result[1]
+    temp_exp = result[2]
+    if time.time() - last_msg > 60:
+        xp += exp
+        temp_exp += exp
+        last_msg = time.time()
+        sql = ('UPDATE users SET exp = ?, temp_exp = ?, last_msg = ? WHERE user_id = ?')
+        val = (xp, temp_exp, last_msg, int(user.id))
+        cursor.execute(sql, val)
+        db.commit()
 
 
-async def level_up(users, user, message):
-    experience = users[f'{user.id}']['experience']
-    lvl_start = users[f'{user.id}']['level']
-    lvl_end = int(experience ** (1 / 6))
-    if lvl_start < lvl_end:
-        await message.channel.send(f'{user.mention} has leveled up to level {lvl_end}')
-        users[f'{user.id}']['level'] = lvl_end
-        users[f'{user.id}']['temp_exp'] = 0
+async def level_up(user, message):
+
+    db = sqlite3.connect('users.db')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}"')
+    result = cursor.fetchone()
+    exp = result[0]
+    level_srt = result[1]
+    level_end = int(exp ** (1/6))
+
+    if level_srt < level_end:
+        await message.channel.send(f'{user.mention} has leveled up to level {level_end}')
+        level = level_end
+        temp_exp = 0
+        sql = ('UPDATE users SET temp_exp = ?, level = ? WHERE user_id = ?')
+        val = (temp_exp, level, int(user.id))
+        cursor.execute(sql, val)
+        db.commit()
 
 
 @client.command()
 async def rank(ctx, member: discord.Member = None):
-    if not member:
+
+    if member is None:
+
+        db = sqlite3.connect('users.db')
+        cursor = db.cursor()
         id_1 = ctx.message.author.id
-        with open('users.json', 'r') as f:
-            users = json.load(f)
-        lvl = str(users[str(id_1)]['level'])
-        exp = str(users[str(id_1)]['experience'])
+        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}"')
+        result = cursor.fetchone()
+        exp = int(result[0])
+        lvl = int(result[1])
+        temp_exp = int(result[2])
 
         bg = Image.open('Rank Card.png')
         asset = ctx.author.avatar_url_as(size=128)
@@ -137,14 +152,11 @@ async def rank(ctx, member: discord.Member = None):
         f1 = ImageFont.truetype('cour.ttf', 65)
         f2 = ImageFont.truetype('arial.ttf', 28)
         f3 = ImageFont.truetype('arial.ttf', 35)
-        draw.text((850, 45), lvl, (98, 211, 245), font=f1)
-        draw.text((790, 140), exp, (127, 131, 132), font=f2)
-        draw.text((270, 120), name, (255, 255, 255), font=f3)
+        draw.text((850, 45), str(lvl), (98, 211, 245), font=f1)
+        draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
+        draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
-
-        lvl_start = users[str(id_1)]['level']
-        req_xp_for_lvl = ((lvl_start+1) ** 6)
-        temp_exp = users[str(id_1)]['temp_exp']
+        req_xp_for_lvl = (lvl+1) ** 6
         perc = (temp_exp/req_xp_for_lvl)*100
         rectangle2 = Image.open('rect_bg.png')
         rectangle2 = rectangle2.resize((630, 35))
@@ -159,11 +171,15 @@ async def rank(ctx, member: discord.Member = None):
         bg.save('rank.png')
         await ctx.send(file=discord.File('rank.png'))
     else:
+
+        db = sqlite3.connect('users.db')
+        cursor = db.cursor()
         id_1 = member.id
-        with open('users.json', 'r') as f:
-            users = json.load(f)
-        lvl = users[str(id_1)]['level']
-        exp = str(users[str(id_1)]['experience'])
+        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}"')
+        result = cursor.fetchone()
+        exp = int(result[0])
+        lvl = int(result[1])
+        temp_exp = int(result[2])
 
         bg = Image.open('Rank Card.png')
         asset = member.avatar_url_as(size=128)
@@ -178,14 +194,12 @@ async def rank(ctx, member: discord.Member = None):
         f1 = ImageFont.truetype('cour.ttf', 65)
         f2 = ImageFont.truetype('arial.ttf', 28)
         f3 = ImageFont.truetype('arial.ttf', 35)
-        draw.text((850, 45), lvl, (98, 211, 245), font=f1)
-        draw.text((790, 140), exp, (127, 131, 132), font=f2)
-        draw.text((270, 120), name, (255, 255, 255), font=f3)
+        draw.text((850, 45), str(lvl), (98, 211, 245), font=f1)
+        draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
+        draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
-        lvl_start = users[str(id_1)]['level']
-        req_xp_for_lvl = ((lvl_start+1) ** 6)
-        temp_exp = users[str(id_1)]['temp_exp']
-        perc = (temp_exp/req_xp_for_lvl)*100
+        req_xp_for_lvl = ((lvl + 1) ** 6)
+        perc = (temp_exp / req_xp_for_lvl) * 100
         rectangle2 = Image.open('rect_bg.png')
         rectangle2 = rectangle2.resize((630, 35))
 
@@ -193,11 +207,11 @@ async def rank(ctx, member: discord.Member = None):
 
         if perc > 0:
             rectangle1 = Image.open('rect.png')
-            rectangle1 = rectangle1.resize((round(626 * perc/100), 35))
+            rectangle1 = rectangle1.resize((round(626 * perc / 100), 35))
             bg.paste(rectangle1, (255, 185))
 
         bg.save('rank.png')
-        await ctx.send(file=discord.File('rank.png'))'''
+        await ctx.send(file=discord.File('rank.png'))
 
 
 @client.event
