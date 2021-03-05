@@ -5,7 +5,7 @@ import youtube_dl
 import requests
 import os
 import time
-import sqlite3
+import mysql.connector
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from discord.ext import commands
@@ -68,7 +68,7 @@ async def on_message(message):
     if not message.author.bot:
 
         exp = random.randrange(15,  26)
-        await update_data( message.author)
+        await update_data(message.author)
         await add_experience(message.author, exp)
         await level_up(message.author, message)
 
@@ -76,12 +76,12 @@ async def on_message(message):
 
 
 async def update_data(user):
-    db = sqlite3.connect('users.db')
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}"')
     result = cursor.fetchone()
     if result is None:
-        sql = (f'INSERT INTO users(user_id, exp, level, last_msg, temp_exp) VALUES(?,?,?,?,?)')
+        sql = (f'INSERT INTO users(user_id, exp, level, last_msg, temp_exp) VALUES(%s, %s, %s, %s, %s)')
         val = (int(user.id), 0, 1, 0, 0)
         cursor.execute(sql, val)
         db.commit()
@@ -89,7 +89,7 @@ async def update_data(user):
 
 async def add_experience(user, exp):
 
-    db = sqlite3.connect('users.db')
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}"')
     result = cursor.fetchone()
@@ -100,15 +100,15 @@ async def add_experience(user, exp):
         xp += exp
         temp_exp += exp
         last_msg = time.time()
-        sql = ('UPDATE users SET exp = ?, temp_exp = ?, last_msg = ? WHERE user_id = ?')
-        val = (xp, temp_exp, last_msg, int(user.id))
+        sql = 'UPDATE users SET exp = %s, temp_exp = %s, last_msg = %s WHERE user_id = %s'
+        val = (xp, temp_exp, last_msg, user.id)
         cursor.execute(sql, val)
         db.commit()
 
 
 async def level_up(user, message):
 
-    db = sqlite3.connect('users.db')
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}"')
     result = cursor.fetchone()
@@ -120,8 +120,8 @@ async def level_up(user, message):
         await message.channel.send(f'{user.mention} has leveled up to level {level_end}')
         level = level_end
         temp_exp = 0
-        sql = ('UPDATE users SET temp_exp = ?, level = ? WHERE user_id = ?')
-        val = (temp_exp, level, int(user.id))
+        sql = 'UPDATE users SET temp_exp = %s, level = %s WHERE user_id = %s'
+        val = (temp_exp, level, user.id)
         cursor.execute(sql, val)
         db.commit()
 
@@ -131,7 +131,7 @@ async def rank(ctx, member: discord.Member = None):
 
     if member is None:
 
-        db = sqlite3.connect('users.db')
+        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
         cursor = db.cursor()
         id_1 = ctx.message.author.id
         cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}"')
@@ -173,7 +173,7 @@ async def rank(ctx, member: discord.Member = None):
         await ctx.send(file=discord.File('rank.png'))
     else:
 
-        db = sqlite3.connect('users.db')
+        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
         cursor = db.cursor()
         id_1 = member.id
         cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}"')
