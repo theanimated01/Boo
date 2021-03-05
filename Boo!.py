@@ -69,14 +69,14 @@ async def on_message(message):
     if not message.author.bot:
 
         exp = random.randrange(15,  26)
-        await update_data(message.author)
-        await add_experience(message.author, exp)
-        await level_up(message.author, message)
+        await update_data(message.author, message.guild.id)
+        await add_experience(message.author, exp, message.guild.id)
+        await level_up(message.author, message, message.guild.id)
 
     await client.process_commands(message)
 
 
-async def update_data(user):
+async def update_data(user, msg):
     
     try:
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
@@ -84,23 +84,23 @@ async def update_data(user):
         print(err)
         
     cursor = db.cursor()
-    cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}"')
+    cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
     if result is None:
-        sql = (f'INSERT INTO users(user_id, exp, level, last_msg, temp_exp) VALUES(%s, %s, %s, %s, %s)')
-        val = (int(user.id), 0, 1, 0, 0)
+        sql = (f'INSERT INTO users(guild_id, user_id, exp, level, last_msg, temp_exp) VALUES(%s, %s, %s, %s, %s, %s)')
+        val = (int(msg), int(user.id), 0, 1, 0, 0)
         cursor.execute(sql, val)
         db.commit()
 
 
-async def add_experience(user, exp):
+async def add_experience(user, exp, msg):
 
     try:
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     except mysql.connector.error as err:
         print(err)
     cursor = db.cursor()
-    cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}"')
+    cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
     xp = result[0]
     last_msg = result[1]
@@ -109,20 +109,20 @@ async def add_experience(user, exp):
         xp += exp
         temp_exp += exp
         last_msg = time.time()
-        sql = 'UPDATE users SET exp = %s, temp_exp = %s, last_msg = %s WHERE user_id = %s'
-        val = (xp, temp_exp, last_msg, int(user.id))
+        sql = 'UPDATE users SET exp = %s, temp_exp = %s, last_msg = %s WHERE user_id = %s and guild_id = %s'
+        val = (xp, temp_exp, last_msg, int(user.id), int(msg))
         cursor.execute(sql, val)
         db.commit()
     
 
-async def level_up(user, message):
+async def level_up(user, message, msg):
 
     try:
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     except mysql.connector.error as err:
         print(err)
     cursor = db.cursor()
-    cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}"')
+    cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
     exp = result[0]
     level_srt = result[1]
@@ -132,8 +132,8 @@ async def level_up(user, message):
         await message.channel.send(f'{user.mention} has leveled up to level {level_end}')
         level = level_end
         temp_exp = 0
-        sql = 'UPDATE users SET temp_exp = %s, level = %s WHERE user_id = %s'
-        val = (temp_exp, level, int(user.id))
+        sql = 'UPDATE users SET temp_exp = %s, level = %s WHERE user_id = %s and guild_id = %s'
+        val = (temp_exp, level, int(user.id), int(msg))
         cursor.execute(sql, val)
         db.commit()
 
@@ -146,7 +146,7 @@ async def rank(ctx, member: discord.Member = None):
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
         cursor = db.cursor()
         id_1 = ctx.message.author.id
-        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}"')
+        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
         result = cursor.fetchone()
         exp = int(result[0])
         lvl = int(result[1])
@@ -188,7 +188,7 @@ async def rank(ctx, member: discord.Member = None):
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
         cursor = db.cursor()
         id_1 = member.id
-        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}"')
+        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
         result = cursor.fetchone()
         exp = int(result[0])
         lvl = int(result[1])
