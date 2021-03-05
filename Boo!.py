@@ -246,7 +246,7 @@ async def help(ctx):
     embed.add_field(name='leave or disconnect or dc', value='Disconnects the bot from VC', inline=False)
     embed.add_field(name='rank', value='Gives your rank card (Temporarily down)', inline=False)
 
-    await ctx.send(embed=embed)
+    await ctx.author.send(embed=embed)
 
 
 @client.command()
