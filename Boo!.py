@@ -87,8 +87,8 @@ async def update_data(user, msg):
     cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
     if result is None:
-        sql = (f'INSERT INTO users(guild_id, user_id, exp, level, last_msg, temp_exp) VALUES(%s, %s, %s, %s, %s, %s)')
-        val = (int(msg), int(user.id), 0, 1, 0, 0)
+        sql = (f'INSERT INTO users(guild_id, user_id, exp, level, last_msg, temp_exp, on_lvl_up) VALUES(%s, %s, %s, %s, %s, %s, %s)')
+        val = (int(msg), int(user.id), 0, 1, 0, 0, 0)
         cursor.execute(sql, val)
         db.commit()
 
@@ -125,6 +125,7 @@ async def level_up(user, message, msg):
     cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
     exp = result[0]
+    on_lvl_up = exp
     level_srt = result[1]
     level_end = int(exp ** (1/6))
 
@@ -132,8 +133,8 @@ async def level_up(user, message, msg):
         await message.channel.send(f'{user.mention} has leveled up to level {level_end}')
         level = level_end
         temp_exp = 0
-        sql = 'UPDATE users SET temp_exp = %s, level = %s WHERE user_id = %s and guild_id = %s'
-        val = (temp_exp, level, int(user.id), int(msg))
+        sql = 'UPDATE users SET temp_exp = %s, level = %s, on_lvl_up = %s WHERE user_id = %s and guild_id = %s'
+        val = (temp_exp, level, on_lvl_up, int(user.id), int(msg))
         cursor.execute(sql, val)
         db.commit()
 
@@ -146,11 +147,12 @@ async def rank(ctx, member: discord.Member = None):
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
         cursor = db.cursor()
         id_1 = ctx.message.author.id
-        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
+        cursor.execute(f'SELECT exp, level, temp_exp, on_lvl_up FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
         result = cursor.fetchone()
         exp = int(result[0])
         lvl = int(result[1])
         temp_exp = int(result[2])
+        on_lvl_up = int(result[3])
 
         bg = Image.open('Rank Card.png')
         asset = ctx.author.avatar_url_as(size=128)
@@ -169,7 +171,7 @@ async def rank(ctx, member: discord.Member = None):
         draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
-        req_xp_for_lvl = (lvl+1) ** 6
+        req_xp_for_lvl = (lvl+1) ** 6 - on_lvl_up
         perc = (temp_exp/req_xp_for_lvl)*100
         rectangle2 = Image.open('rect_bg.png')
         rectangle2 = rectangle2.resize((630, 35))
@@ -188,11 +190,12 @@ async def rank(ctx, member: discord.Member = None):
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
         cursor = db.cursor()
         id_1 = member.id
-        cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
+        cursor.execute(f'SELECT exp, level, temp_exp, on_lvl_up FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
         result = cursor.fetchone()
         exp = int(result[0])
         lvl = int(result[1])
         temp_exp = int(result[2])
+        on_lvl_up = int(result[3])
 
         bg = Image.open('Rank Card.png')
         asset = member.avatar_url_as(size=128)
@@ -211,7 +214,7 @@ async def rank(ctx, member: discord.Member = None):
         draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
-        req_xp_for_lvl = ((lvl + 1) ** 6)
+        req_xp_for_lvl = ((lvl + 1) ** 6) - on_lvl_up
         perc = (temp_exp / req_xp_for_lvl) * 100
         rectangle2 = Image.open('rect_bg.png')
         rectangle2 = rectangle2.resize((630, 35))
