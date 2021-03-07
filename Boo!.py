@@ -259,7 +259,7 @@ async def help(ctx):
     embed.add_field(name='resume or r', value='Resumes the song currently playing', inline=False)
     embed.add_field(name='skip or s', value='Skips the song playing and plays next song in queue', inline=False)
     embed.add_field(name='leave or disconnect or dc', value='Disconnects the bot from VC', inline=False)
-    embed.add_field(name='rank', value='Gives your rank card (Temporarily down)', inline=False)
+    embed.add_field(name='rank', value='Gives your rank card', inline=False)
 
     await ctx.author.send(embed=embed)
 
