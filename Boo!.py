@@ -76,31 +76,23 @@ async def on_message(message):
     await client.process_commands(message)
 
 
-async def update_data(user, msg):
-    
-    try:
-        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
-    except mysql.connector.error as err:
-        print(err)
-        
+async def update_data(user, message):
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
-    cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
+    cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
     result = cursor.fetchone()
     if result is None:
         sql = (f'INSERT INTO users(guild_id, user_id, exp, level, last_msg, temp_exp, on_lvl_up) VALUES(%s, %s, %s, %s, %s, %s, %s)')
-        val = (int(msg), int(user.id), 0, 1, 0, 0, 0)
+        val = (int(message), int(user.id), 0, 1, 0, 0, 0)
         cursor.execute(sql, val)
         db.commit()
 
 
-async def add_experience(user, exp, msg):
+async def add_experience(user, exp, message):
 
-    try:
-        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
-    except mysql.connector.error as err:
-        print(err)
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
-    cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
+    cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
     result = cursor.fetchone()
     xp = result[0]
     last_msg = result[1]
@@ -110,33 +102,48 @@ async def add_experience(user, exp, msg):
         temp_exp += exp
         last_msg = time.time()
         sql = 'UPDATE users SET exp = %s, temp_exp = %s, last_msg = %s WHERE user_id = %s and guild_id = %s'
-        val = (xp, temp_exp, last_msg, int(user.id), int(msg))
+        val = (xp, temp_exp, last_msg, user.id, message)
         cursor.execute(sql, val)
         db.commit()
-    
+
 
 async def level_up(user, message, msg):
 
-    try:
-        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
-    except mysql.connector.error as err:
-        print(err)
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
     exp = result[0]
     on_lvl_up = exp
-    level_srt = result[1]
-    level_end = int(exp ** (1/6))
+    level = result[1]
+    temp_exp = result[2]
+    req_xp = int((level**4)+(level*100))
 
-    if level_srt < level_end:
-        await message.channel.send(f'{user.mention} has leveled up to level {level_end}')
-        level = level_end
+    if temp_exp >= req_xp:
+        await message.channel.send(f'{user.mention} has leveled up to level {level+1}')
+        level += 1
         temp_exp = 0
         sql = 'UPDATE users SET temp_exp = %s, level = %s, on_lvl_up = %s WHERE user_id = %s and guild_id = %s'
-        val = (temp_exp, level, on_lvl_up, int(user.id), int(msg))
+        val = (temp_exp, level, on_lvl_up, user.id, msg)
         cursor.execute(sql, val)
         db.commit()
+
+
+@client.command(aliases=['lb'])
+async def leaderboard(ctx):
+    guild_id = ctx.guild.id
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT user_id, exp FROM users WHERE guild_id = "{guild_id}" ORDER BY exp DESC')
+    result = cursor.fetchmany(10)
+    embed = discord.Embed(color=discord.Color.purple())
+    embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
+    embed.set_author(name='**LEADERBOARD**')
+    for i in result:
+        varvar = await client.fetch_user(i[0])
+        embed.add_field(name=varvar, value=f'exp - {i[1]}', inline=False)
+
+    await ctx.send(embed=embed)
 
 
 @client.command()
@@ -171,7 +178,7 @@ async def rank(ctx, member: discord.Member = None):
         draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
-        req_xp_for_lvl = (lvl+1) ** 6 - on_lvl_up
+        req_xp_for_lvl = (lvl ** 4) + (lvl*100)
         perc = (temp_exp/req_xp_for_lvl)*100
         rectangle2 = Image.open('rect_bg.png')
         rectangle2 = rectangle2.resize((630, 35))
@@ -214,7 +221,7 @@ async def rank(ctx, member: discord.Member = None):
         draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
-        req_xp_for_lvl = ((lvl + 1) ** 6) - on_lvl_up
+        req_xp_for_lvl = (lvl ** 4) + (lvl*100)
         perc = (temp_exp / req_xp_for_lvl) * 100
         rectangle2 = Image.open('rect_bg.png')
         rectangle2 = rectangle2.resize((630, 35))
