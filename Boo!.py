@@ -132,7 +132,7 @@ async def level_up(user, message, msg):
 @client.command(aliases=['lb'])
 async def leaderboard(ctx):
     guild_id = ctx.guild.id
-    db = mysql.connector.connect(host='127.0.0.1', user='root', password='sql%dEO3qo', database='users')
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id, exp, level FROM users WHERE guild_id = "{guild_id}" ORDER BY exp DESC')
     result = cursor.fetchmany(10)
