@@ -14,9 +14,11 @@ from discord import FFmpegPCMAudio
 
 
 def get_prefix(client, message):
-    with open('Prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-    return prefixes[str(message.guild.id)]
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT prefix FROM prefixes WHERE guild_id = "{message.guild.id}"')
+    result = cursor.fetchone()
+    return result
 
 
 client = commands.Bot(command_prefix=get_prefix)
@@ -32,35 +34,27 @@ async def on_ready():
 
 @client.event
 async def on_guild_join(guild):
-    with open('Prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes[str(guild.id)] = '-'
-
-    with open('Prefixes.json', 'w') as f:
-        json.dump(prefixes, f)
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    sql = (f'INSERT INTO prefixes (guild_id, prefix) VALUES(%s, %s)')
+    val = (guild.id, '_')
+    cursor.execute(sql, val)
 
 
 @client.event
 async def on_guild_remove(guild):
-    with open('Prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes.pop(str(guild.id))
-
-    with open('Prefixes.json', 'w') as f:
-        json.dump(prefixes, f)
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    cursor.execute(f'DELETE FROM prefixes WHERE guild_id = "{guild.id}"')
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def prefix(ctx, prefix):
-    with open('Prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-    prefixes[str(ctx.guild.id)] = prefix
-    with open('Prefixes.json', 'w') as f:
-        json.dump(prefixes, f)
-    await ctx.send(f'Successfully changed prefix to {prefix} !')
+async def prefix(ctx, *, prefix):
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    sql = (f'UPDATE prefixes SET prefix = %s WHERE guild_id = %s')
+    val = (prefix, ctx.guild.id)
     
     
 @client.event
@@ -166,8 +160,14 @@ async def rank(ctx, member: discord.Member = None):
         data = BytesIO(await asset.read())
         pfp = Image.open(data)
         pfp = pfp.resize((135, 135))
+        bigsize = (pfp.size[0] * 3, pfp.size[1] * 3)
+        mask = Image.new('L', bigsize, 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0) + bigsize, fill=255)
+        mask = mask.resize(pfp.size, Image.ANTIALIAS)
+        pfp.putalpha(mask)
 
-        bg.paste(pfp, (70, 70))
+        bg.paste(pfp, (70, 70), pfp)
 
         draw = ImageDraw.Draw(bg)
         name = str(ctx.message.author)
@@ -209,8 +209,14 @@ async def rank(ctx, member: discord.Member = None):
         data = BytesIO(await asset.read())
         pfp = Image.open(data)
         pfp = pfp.resize((135, 135))
+        bigsize = (pfp.size[0] * 3, pfp.size[1] * 3)
+        mask = Image.new('L', bigsize, 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0) + bigsize, fill=255)
+        mask = mask.resize(pfp.size, Image.ANTIALIAS)
+        pfp.putalpha(mask)
 
-        bg.paste(pfp, (70, 70))
+        bg.paste(pfp, (70, 70), pfp)
 
         draw = ImageDraw.Draw(bg)
         name = str(member)
