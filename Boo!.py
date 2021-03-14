@@ -155,7 +155,7 @@ async def rank(ctx, member: discord.Member = None):
         temp_exp = int(result[2])
         on_lvl_up = int(result[3])
 
-        bg = Image.open('Rank Card.png')
+        bg = Image.open('Rank Card(1).png')
         asset = ctx.author.avatar_url_as(size=128)
         data = BytesIO(await asset.read())
         pfp = Image.open(data)
@@ -204,7 +204,7 @@ async def rank(ctx, member: discord.Member = None):
         temp_exp = int(result[2])
         on_lvl_up = int(result[3])
 
-        bg = Image.open('Rank Card.png')
+        bg = Image.open('Rank Card(1).png')
         asset = member.avatar_url_as(size=128)
         data = BytesIO(await asset.read())
         pfp = Image.open(data)
