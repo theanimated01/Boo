@@ -175,7 +175,7 @@ async def rank(ctx, member: discord.Member = None):
         f2 = ImageFont.truetype('arial.ttf', 28)
         f3 = ImageFont.truetype('arial.ttf', 35)
         draw.text((850, 45), str(lvl), (98, 211, 245), font=f1)
-        draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
+        draw.text((770, 140), str(exp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
         req_xp_for_lvl = (lvl ** 4) + (lvl*100)
