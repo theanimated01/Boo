@@ -283,20 +283,20 @@ async def ping(ctx):
 
 
 @client.command(aliases=['hey', 'hello'])
-async def hi(ctx, mem=None):
-    if mem == None:
+async def hi(ctx, mem: discord.Member = None):
+    if mem is None:
         await ctx.send(f'Hello IDJOT!')
     else:
-        await ctx.send(f'Hello IDJOT! {mem}')
+        await ctx.send(f'<@!{ctx.author.id}> says HIII! <@!{mem.id}>')
 
 
 @client.command()
-async def luv(ctx, mem=None):
-    if mem == None:
+async def luv(ctx, mem: discord.Member = None):
+    if mem is None:
         await ctx.send('Spreading luv to everyone in the server')
 
     else:
-        await ctx.send(f'You have sent luv to {mem}')
+        await ctx.send(f'<@!{ctx.author.id}> sends luv to <@!{mem.id}>')
 
 
 @client.command(aliases=['8ball'])
@@ -316,11 +316,11 @@ async def clear(ctx, amount=1):
 
 @client.command()
 @commands.cooldown(1, 30, commands.BucketType.user)
-async def idjot(ctx, mem=None):
-    if mem == None:
-        await ctx.send(f'You are an IDJOT!')
+async def idjot(ctx, mem: discord.Member = None):
+    if mem is None:
+        await ctx.send(f"You're an IDJOT!")
     else:
-        await ctx.send(f'{mem} is an IDJOT!')
+        await ctx.send(f'<@!{mem.id}> is an IDJOT!')
 
 
 @client.command(aliases=['dc', 'disconnect'])
@@ -428,8 +428,7 @@ async def skip(ctx):
 
     voice = get(client.voice_clients, guild=ctx.guild)
     role = discord.utils.get(ctx.guild.roles, name='DJ')
-    print(ctx.author.roles)
-    if role in ctx.author.roles:
+    if role in ctx.author.roles or ctx.message.author.guild_permissions.manage_channels:
         if len(queue) <= 0:
             await ctx.send('No song in queue to skip to. Stopped the one currently playing')
             voice.stop()
@@ -442,16 +441,15 @@ async def skip(ctx):
             voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
             voice.is_playing()
     else:
-        await ctx.send("Can't skip song as you do not have the DJ role")
+        await ctx.send("Can't skip song as you do not have the DJ role or Manage Role permission")
 
 
 @client.command(aliases=['view'])
 async def viewq(ctx):
 
     embed = discord.Embed(
-        color=discord.Color.dark_gray()
+        color=discord.Color.purple(), title='QUEUE'
     )
-    embed.set_author(name='QUEUE')
     for i in range(0, len(queue)):
         embed.add_field(name='Song ' + str(i+1), value=queue[i], inline=False)
 
