@@ -319,6 +319,8 @@ async def clear(ctx, amount=1):
 async def idjot(ctx, mem: discord.Member = None):
     if mem is None:
         await ctx.send(f"You're an IDJOT!")
+    elif mem.id == 432337328694886408:
+        await ctx.send("My creator is not an idjot. You're an IDJOT!")
     else:
         await ctx.send(f'<@!{mem.id}> is an IDJOT!')
 
