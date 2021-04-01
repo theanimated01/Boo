@@ -59,7 +59,14 @@ async def prefix(ctx, *, prefix):
     
 @client.event
 async def on_message(message):
-
+    
+        if client.user.mentioned_in(message):
+        a = message.content
+        a = a.split(' ')
+        if len(a) == 2:
+            if a[1] == 'help' or a[1] == 'Help' or a[1] == 'HELP':
+                await help(message)
+                
     if not message.author.bot:
 
         exp = random.randrange(15,  26)
