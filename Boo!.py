@@ -27,9 +27,17 @@ client.remove_command('help')
 
 @client.event
 async def on_ready():
-    mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
-    await client.change_presence(activity=discord.Game('-help'))
+    mysql.connector.connect(host='127.0.0.1', user='root', password='sql%dEO3qo', database='users')
+    await client.change_presence(activity=discord.Game('_help'))
+    loopy.start()
     print('Bot is ready')
+
+
+@tasks.loop(seconds=43200)
+async def loopy():
+    channel = client.get_channel(810872739552297003)
+    await channel.send('Here. Have sum luv')
+    await channel.send(f'<:sageluv:814086133238464512>')
 
 
 @client.event
@@ -288,7 +296,15 @@ async def help(ctx):
 async def ping(ctx):
     await ctx.send(f'{round(client.latency * 1000)}ms')
 
-
+    
+@client.command()
+@commands.is_owner()
+async def busy(ctx):
+    await ctx.send("I'm pretty busy coz I got a very hectic schedule with a ton of classes nowadays, and I've noticed the server is dying")
+    await ctx.send('So I coded my bot to send some luv to everyone, every 12 hours')
+    await ctx.send('This definitely has nothing to do with me being tired of studying maths and wanting to do some coding. hehe.')
+        
+    
 @client.command(aliases=['hey', 'hello'])
 async def hi(ctx, mem: discord.Member = None):
     if mem is None:
