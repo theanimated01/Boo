@@ -27,7 +27,6 @@ client.remove_command('help')
 
 @client.event
 async def on_ready():
-    mysql.connector.connect(host='127.0.0.1', user='root', password='sql%dEO3qo', database='users')
     await client.change_presence(activity=discord.Game('_help'))
     loopy.start()
     print('Bot is ready')
