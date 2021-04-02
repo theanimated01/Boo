@@ -8,7 +8,7 @@ import time
 import mysql.connector
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.utils import get
 from discord import FFmpegPCMAudio
 
