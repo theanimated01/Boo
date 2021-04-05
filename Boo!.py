@@ -28,17 +28,9 @@ client.remove_command('help')
 @client.event
 async def on_ready():
     await client.change_presence(activity=discord.Game('-help'))
-    loopy.start()
     print('Bot is ready')
-
-
-@tasks.loop(seconds=43200)
-async def loopy():
-    channel = client.get_channel(810872739552297003)
-    await channel.send('Here. Have sum luv')
-    await channel.send(f'<:sageluv:814086133238464512>')
-
-
+    
+    
 @client.event
 async def on_guild_join(guild):
     db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
