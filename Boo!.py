@@ -62,6 +62,8 @@ async def prefix(ctx, *, prefix):
     cursor = db.cursor()
     sql = (f'UPDATE prefixes SET prefix = %s WHERE guild_id = %s')
     val = (prefix, ctx.guild.id)
+    cursor.execute(sql, val)
+    db.commit
     
     
 @client.event
