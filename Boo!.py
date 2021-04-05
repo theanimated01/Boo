@@ -63,7 +63,7 @@ async def prefix(ctx, *, prefix):
     sql = (f'UPDATE prefixes SET prefix = %s WHERE guild_id = %s')
     val = (prefix, ctx.guild.id)
     cursor.execute(sql, val)
-    db.commit
+    db.commit()
     
     
 @client.event
@@ -266,28 +266,31 @@ async def on_command_error(ctx, error):
 
 @client.command()
 async def help(ctx):
-
+    
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT prefix FROM prefixes WHERE guild_id = "{ctx.guild.id}"')
+    result = cursor.fetchone()
+    pre = result[0]
     embed = discord.Embed(
         color= discord.Color.purple()
     )
 
     embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
     embed.set_author(name='HELP', icon_url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
-    embed.add_field(name='ping', value='gives the ping of the bot', inline=False)
-    embed.add_field(name='prefix', value='can be used to change prefix of bot (can be used by administrators only)', inline=False)
-    embed.add_field(name='hi', value='just says hi, or maybe try mentioning someone ;)', inline=False)
-    embed.add_field(name='luv', value='spread luv in the server or to a specific person', inline=False)
-    embed.add_field(name='8ball', value='just your standard 8ball', inline=False)
-    embed.add_field(name='clear', value='clears a particular amount of messages. (must have manage message permission)', inline=False)
-    embed.add_field(name='idjot', value='Your standard idjot command to call someone an IDJOT. kekw', inline=False)
-    embed.add_field(name='play or p', value='Plays a song (does not work with spotify yet)', inline=False)
-    embed.add_field(name='queue or q', value='Add a song to queue', inline=False)
-    embed.add_field(name='view', value='Shows the queue', inline=False)
-    embed.add_field(name='pause or pa', value='Pauses the song currently playing', inline=False)
-    embed.add_field(name='resume or r', value='Resumes the song currently playing', inline=False)
-    embed.add_field(name='skip or s', value='Skips the song playing and plays next song in queue', inline=False)
-    embed.add_field(name='leave or disconnect or dc', value='Disconnects the bot from VC', inline=False)
-    embed.add_field(name='rank', value='Gives your rank card', inline=False)
+    embed.add_field(name=f'`{pre}ping`', value='gives the ping of the bot', inline=False)
+    embed.add_field(name=f'`{pre}prefix`', value='can be used to change prefix of bot (can be used by administrators only)', inline=False)
+    embed.add_field(name=f'`{pre}hi`', value='just says hi, or maybe try mentioning someone ;)', inline=False)
+    embed.add_field(name=f'`{pre}luv`', value='spread luv in the server or to a specific person', inline=False)
+    embed.add_field(name=f'`{pre}8ball`', value='just your standard 8ball', inline=False)
+    embed.add_field(name=f'`{pre}clear`', value='clears a particular amount of messages. (must have manage message permission)', inline=False)
+    embed.add_field(name=f'`{pre}idjot`', value='Your standard idjot command to call someone an IDJOT. kekw', inline=False)
+    embed.add_field(name=f'`{pre}play` or `{pre}p`', value='Plays a song (does not work with spotify yet)', inline=False)
+    embed.add_field(name=f'`{pre}queue` or `{pre}q`', value='Add a song to queue', inline=False)
+    embed.add_field(name=f'`{pre}pause` or `{pre}pa`', value='Pauses the song currently playing', inline=False)
+    embed.add_field(name=f'`{pre}resume` or `{pre}r`', value='Resumes the song currently playing', inline=False)
+    embed.add_field(name=f'`{pre}skip` or `{pre}s`', value='Skips the song playing and plays next song in queue', inline=False)
+    embed.add_field(name=f'`{pre}leave` or `{pre}disconnect` or `{pre}dc`', value='Disconnects the bot from VC', inline=False)
 
     await ctx.author.send(embed=embed)
 
