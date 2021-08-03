@@ -279,10 +279,13 @@ async def help(ctx):
     embed.add_field(name=f'`{pre}idjot`', value='Your standard idjot command to call someone an IDJOT. kekw', inline=False)
     embed.add_field(name=f'`{pre}play` or `{pre}p`', value='Plays a song (does not work with spotify yet)', inline=False)
     embed.add_field(name=f'`{pre}queue` or `{pre}q`', value='Add a song to queue', inline=False)
+    embed.add_field(name=f'`{pre}viewq` or `{pre}view`', value='Shows songs in queue', inline=False)
     embed.add_field(name=f'`{pre}pause` or `{pre}pa`', value='Pauses the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}resume` or `{pre}r`', value='Resumes the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}skip` or `{pre}s`', value='Skips the song playing and plays next song in queue', inline=False)
     embed.add_field(name=f'`{pre}leave` or `{pre}disconnect` or `{pre}dc`', value='Disconnects the bot from VC', inline=False)
+    embed.add_field(name=f'`{pre}leaderbord` or `{pre}lb`', value='Shows the xp leaderboard', inline=False)
+    embed.add_field(name=f'`{pre}rank`', value='Shows your rank card', inline=False)
 
     await ctx.author.send(embed=embed)
 
