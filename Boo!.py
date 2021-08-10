@@ -322,10 +322,11 @@ async def luv(ctx, mem: discord.Member = None):
 
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
-    responses = ['Yes', 'You can rely on it', 'All signs point to yes',
-                 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again',
-                 'I would say no', 'Nah', 'All signs point to no']
-    await ctx.send(f'{random.choice(responses)}')
+    if question=='is carol hot':
+        await ctx.send('Ofc she is hot. That isnt even a question.')
+    else:
+        responses = ['Yes', 'You can rely on it', 'All signs point to yes', 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again', 'I would say no', 'Nah', 'All signs point to no']
+        await ctx.send(f'{random.choice(responses)}')
 
 
 @client.command(aliases=['delete'])
