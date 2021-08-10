@@ -325,7 +325,7 @@ async def _8ball(ctx, *, question):
     if question=='is carol hot':
         await ctx.send('Ofc she is hot. That isnt even a question.')
     else:
-        responses = ['Yes', 'You can rely on it', 'All signs point to yes', 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again', 'I would say no', 'Nah', 'All signs point to no']
+        responses = ['Yes', 'You can rely on it', 'All signs point to yes', 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again', 'I would say no', 'Probably yes']
         await ctx.send(f'{random.choice(responses)}')
 
 
