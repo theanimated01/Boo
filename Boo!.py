@@ -322,7 +322,10 @@ async def luv(ctx, mem: discord.Member = None):
 
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
-    if question=='is carol hot' or question=='is carol hot?' or question=='IS CAROL HOT' or question=='IS CAROL HOT?' or question=='am i hot?' or question=='am i hot' or question=='AM I HOT?' or question=='AM I HOT':
+    x=question.split()
+    if x[len(x)-1]=='hot':
+        await.ctx.send("Obviously")
+    elif question=='is carol hot' or question=='is carol hot?' or question=='IS CAROL HOT' or question=='IS CAROL HOT?' or question=='am i hot?' or question=='am i hot' or question=='AM I HOT?' or question=='AM I HOT':
         await ctx.send("Definitely. That isn't even a question.")
     else:
         responses = ['Yes', 'You can rely on it', 'All signs point to yes', 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again', 'I would say no', 'Probably yes']
