@@ -324,7 +324,7 @@ async def luv(ctx, mem: discord.Member = None):
 async def _8ball(ctx, *, question):
     x=question.split()
     if x[len(x)-1]=='hot':
-        await.ctx.send("Obviously")
+        await ctx.send("Obviously")
     elif question=='is carol hot' or question=='is carol hot?' or question=='IS CAROL HOT' or question=='IS CAROL HOT?' or question=='am i hot?' or question=='am i hot' or question=='AM I HOT?' or question=='AM I HOT':
         await ctx.send("Definitely. That isn't even a question.")
     else:
