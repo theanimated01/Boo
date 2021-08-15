@@ -327,10 +327,8 @@ async def _8ball(ctx, *, question):
         await ctx.send("Obviously. Don't doubt it.")
     elif x[len(x)-1]=='DIE' or x[len(x)-1]=='DIE?' or x[len(x)-1]=='die' or x[len(x)-1]=='die?':
         await ctx.send("No one's dying. STFU.")
-    elif question=='is carol hot' or question=='is carol hot?' or question=='IS CAROL HOT' or question=='IS CAROL HOT?' or question=='am i hot?' or question=='am i hot' or question=='AM I HOT?' or question=='AM I HOT':
-        await ctx.send("Definitely. That isn't even a question.")
     else:
-        responses = ['Yes', 'You can rely on it', 'All signs point to yes', 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again', 'I would say no', 'Probably yes']
+        responses = ['Yes', 'You can rely on it', 'All signs point to yes', 'Eh, maybe', 'Cannot predict now', 'Concentrate and ask again', 'I would say no', 'No.', 'Probably yes']
         await ctx.send(f'{random.choice(responses)}')
 
 
