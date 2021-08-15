@@ -323,8 +323,10 @@ async def luv(ctx, mem: discord.Member = None):
 @client.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
     x=question.split()
-    if x[len(x)-1]=='hot' or x[len(x)-1]=='hot?':
-        await ctx.send("Obviously")
+    if x[len(x)-1]=='HOT' or x[len(x)-1]=='HOT?' or x[len(x)-1]=='hot' or x[len(x)-1]=='hot?':
+        await ctx.send("Obviously. Don't doubt it.")
+    elif x[len(x)-1]=='DIE' or x[len(x)-1]=='DIE?' or x[len(x)-1]=='die' or x[len(x)-1]=='die?':
+        await ctx.send("No one's dying. STFU.")
     elif question=='is carol hot' or question=='is carol hot?' or question=='IS CAROL HOT' or question=='IS CAROL HOT?' or question=='am i hot?' or question=='am i hot' or question=='AM I HOT?' or question=='AM I HOT':
         await ctx.send("Definitely. That isn't even a question.")
     else:
