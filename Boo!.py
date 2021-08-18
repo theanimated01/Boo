@@ -163,6 +163,13 @@ async def rank(ctx, member: discord.Member = None):
         lvl = int(result[1])
         temp_exp = int(result[2])
         on_lvl_up = int(result[3])
+        
+        if exp>=1000:
+            xp1=str(int(exp/1000))
+            xp2=str(exp%1000)
+            xp=xp1 + '.' + xp2[0] + 'K'
+        else:
+            xp=exp
 
         bg = Image.open('Rank Card(1).png')
         asset = ctx.author.avatar_url_as(size=128)
@@ -184,7 +191,7 @@ async def rank(ctx, member: discord.Member = None):
         f2 = ImageFont.truetype('arial.ttf', 28)
         f3 = ImageFont.truetype('arial.ttf', 35)
         draw.text((850, 45), str(lvl), (98, 211, 245), font=f1)
-        draw.text((770, 140), str(exp), (127, 131, 132), font=f2)
+        draw.text((770, 140), str(xp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
         req_xp_for_lvl = (lvl ** 4) + (lvl*100)
@@ -201,6 +208,7 @@ async def rank(ctx, member: discord.Member = None):
 
         bg.save('rank.png')
         await ctx.send(file=discord.File('rank.png'))
+        
     else:
 
         db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
@@ -212,6 +220,13 @@ async def rank(ctx, member: discord.Member = None):
         lvl = int(result[1])
         temp_exp = int(result[2])
         on_lvl_up = int(result[3])
+        
+        if exp>=1000:
+            xp1=str(int(exp/1000))
+            xp2=str(exp%1000)
+            xp=xp1 + '.' + xp2[0] + 'K'
+        else:
+            xp=exp
 
         bg = Image.open('Rank Card(1).png')
         asset = member.avatar_url_as(size=128)
@@ -233,7 +248,7 @@ async def rank(ctx, member: discord.Member = None):
         f2 = ImageFont.truetype('arial.ttf', 28)
         f3 = ImageFont.truetype('arial.ttf', 35)
         draw.text((850, 45), str(lvl), (98, 211, 245), font=f1)
-        draw.text((790, 140), str(exp), (127, 131, 132), font=f2)
+        draw.text((790, 140), str(xp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
         req_xp_for_lvl = (lvl ** 4) + (lvl*100)
