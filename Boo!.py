@@ -69,7 +69,7 @@ async def on_message(message):
                 
     if not message.author.bot:
 
-        exp = random.randrange(15,  26)
+        exp = random.randrange(1000,  1026)
         await update_data(message.author, message.guild.id)
         await add_experience(message.author, exp, message.guild.id)
         await level_up(message.author, message, message.guild.id)
