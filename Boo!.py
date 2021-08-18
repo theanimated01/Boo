@@ -141,14 +141,19 @@ async def leaderboard(ctx):
     embed = discord.Embed(title='LEADERBOARD', color=discord.Color.purple(), url='http://allnewsnow.online/l/boo-leaderboard')
     embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
     for i in result:
-        if guild.get_member(i[0]) is not None:
-            varvar = await client.fetch_user(i[0])
-            embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
+        #if guild.get_member(i[0]) is not None:
+        varvar = await client.fetch_user(i[0])
+        embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
 
     await ctx.send(embed=embed)
 
 
-
+@client.command()
+async def test(ctx):
+    await ctx.send(ctx.guild.id)
+    guild = client.get_guild(ctx.guild.id)
+    await ctx.send(guild.get_member('697498446667448360'))
+    
 @client.command()
 async def rank(ctx, member: discord.Member = None):
 
@@ -191,7 +196,7 @@ async def rank(ctx, member: discord.Member = None):
         f2 = ImageFont.truetype('arial.ttf', 28)
         f3 = ImageFont.truetype('arial.ttf', 35)
         draw.text((850, 45), str(lvl), (98, 211, 245), font=f1)
-        draw.text((770, 140), str(xp), (127, 131, 132), font=f2)
+        draw.text((750, 140), str(xp), (127, 131, 132), font=f2)
         draw.text((270, 120), str(name), (255, 255, 255), font=f3)
 
         req_xp_for_lvl = (lvl ** 4) + (lvl*100)
