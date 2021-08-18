@@ -152,7 +152,7 @@ async def leaderboard(ctx):
 async def test(ctx):
     await ctx.send(ctx.guild.id)
     guild = client.get_guild(ctx.guild.id)
-    await ctx.send(guild.get_member('697498446667448360'))
+    await ctx.send(guild.get_member(697498446667448360))
     
 @client.command()
 async def rank(ctx, member: discord.Member = None):
