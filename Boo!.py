@@ -133,6 +133,7 @@ async def level_up(user, message, msg):
 @client.command(aliases=['lb'])
 async def leaderboard(ctx):
     guild_id = ctx.guild.id
+    guild = client.get_guild(guild_id)
     db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id, exp, level FROM users WHERE guild_id = "{guild_id}" ORDER BY exp DESC')
@@ -140,8 +141,9 @@ async def leaderboard(ctx):
     embed = discord.Embed(title='LEADERBOARD', color=discord.Color.purple(), url='http://allnewsnow.online/l/boo-leaderboard')
     embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
     for i in result:
-        varvar = await client.fetch_user(i[0])
-        embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
+        if guild.get_member(i[0]) is not None:
+            varvar = await client.fetch_user(i[0])
+            embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
 
     await ctx.send(embed=embed)
 
