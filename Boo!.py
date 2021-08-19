@@ -82,7 +82,7 @@ async def check_user(message):
     db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE guild_id = "{message}"')
-    reuslt = cusrsor.fetchall()
+    reuslt = cursor.fetchall()
     guild = client.get_guild(message)
     for i in results:
         if guild.get_member(i[0]) is None:
