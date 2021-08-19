@@ -11,7 +11,8 @@ from io import BytesIO
 from discord.ext import commands, tasks
 from discord.utils import get
 from discord import FFmpegPCMAudio
-
+intents=discord.Intents.default()
+intents.members=True
 
 def get_prefix(client, message):
     db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
@@ -21,7 +22,7 @@ def get_prefix(client, message):
     return result
 
 
-client = commands.Bot(command_prefix=get_prefix)
+client = commands.Bot(command_prefix=get_prefix, intents=intents)
 client.remove_command('help')
 
 
@@ -45,8 +46,8 @@ async def on_guild_remove(guild):
     db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'DELETE FROM prefixes WHERE guild_id = "{guild.id}"')
-
-
+    
+    
 @client.command()
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, *, prefix):
@@ -71,13 +72,25 @@ async def on_message(message):
 
         exp = random.randrange(30,  50)
         await update_data(message.author, message.guild.id)
+        #await check_user(message.guild.id)
         await add_experience(message.author, exp, message.guild.id)
         await level_up(message.author, message, message.guild.id)
 
     await client.process_commands(message)
 
-
+async def check_user(message):
+    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    cursor = db.cursor()
+    cursor.execute(f'SELECT user_id FROM users WHERE guild_id = "{message}"')
+    reuslt = cusrsor.fetchall()
+    guild = client.get_guild(message)
+    for i in results:
+        if guild.get_member(i[0]) is None:
+            cursor.execute(f'DELETE FROM users WHERE user_id = "{i[0]}" and guild_id = "{ctx.guild.id}"')
+        
+    
 async def update_data(user, message):
+    guild = client.get_guild(message)
     db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
@@ -87,7 +100,7 @@ async def update_data(user, message):
         val = (int(message), int(user.id), 0, 1, 0, 0, 0)
         cursor.execute(sql, val)
         db.commit()
-
+    
 
 async def add_experience(user, exp, message):
 
@@ -141,10 +154,9 @@ async def leaderboard(ctx):
     embed = discord.Embed(title='LEADERBOARD', color=discord.Color.purple(), url='http://allnewsnow.online/l/boo-leaderboard')
     embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
     for i in result:
-        #for j in guild.members:
-            #if i==j:
-        varvar = await client.fetch_user(i[0])
-        embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
+        if guild.get_member(i[0]) is not None:
+            varvar = await client.fetch_user(i[0])
+            embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
 
     await ctx.send(embed=embed)
 
