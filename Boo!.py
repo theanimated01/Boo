@@ -87,6 +87,7 @@ async def check_user(message):
     for i in result:
         if guild.get_member(i[0]) is None:
             cursor.execute(f'DELETE FROM users WHERE user_id = "{i[0]}" and guild_id = "{message}"')
+            db.commit()
         
     
 async def update_data(user, message):
