@@ -151,8 +151,10 @@ async def leaderboard(ctx):
 @client.command()
 async def test(ctx):
     guild=client.get_guild(ctx.guild.id)
-    for i in guild.members:
-        await ctx.send(i)
+    if guild.get_member(432337328694886408) is None:
+        await ctx.send('None')
+    else:
+        await ctx.send('Not None')
     
 @client.command()
 async def rank(ctx, member: discord.Member = None):
