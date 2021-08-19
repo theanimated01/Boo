@@ -72,7 +72,7 @@ async def on_message(message):
 
         exp = random.randrange(30,  50)
         await update_data(message.author, message.guild.id)
-        #await check_user(message.guild.id)
+        await check_user(message.guild.id)
         await add_experience(message.author, exp, message.guild.id)
         await level_up(message.author, message, message.guild.id)
 
@@ -86,7 +86,7 @@ async def check_user(message):
     guild = client.get_guild(message)
     for i in results:
         if guild.get_member(i[0]) is None:
-            cursor.execute(f'DELETE FROM users WHERE user_id = "{i[0]}" and guild_id = "{ctx.guild.id}"')
+            cursor.execute(f'DELETE FROM users WHERE user_id = "{i[0]}" and guild_id = "{message}"')
         
     
 async def update_data(user, message):
