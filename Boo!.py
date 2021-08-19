@@ -84,7 +84,7 @@ async def check_user(message):
     cursor.execute(f'SELECT user_id FROM users WHERE guild_id = "{message}"')
     reuslt = cursor.fetchall()
     guild = client.get_guild(message)
-    for i in results:
+    for i in result:
         if guild.get_member(i[0]) is None:
             cursor.execute(f'DELETE FROM users WHERE user_id = "{i[0]}" and guild_id = "{message}"')
         
