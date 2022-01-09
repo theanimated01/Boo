@@ -109,16 +109,17 @@ async def add_experience(user, exp, message):
 
     db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
-    cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
+    cursor.execute(f'SELECT exp, last_msg, temp_exp, level FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
     result = cursor.fetchone()
     xp = result[0]
     last_msg = result[1]
     temp_exp = result[2]
-    print(xp)
-    print(temp_exp)
-    print(last_msg)
-    print(user.id)
-    print(message)
+    level = result[3]
+    if level<5:
+        mult = 1
+    else:
+        mult = level//5
+    exp *= mult
     if time.time() - last_msg > 60:
         xp += exp
         temp_exp += exp
