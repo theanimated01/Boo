@@ -444,7 +444,10 @@ async def play(ctx, *, url):
         await ctx.send(f'Successfully joined `{channel}`')
 
     if voice.is_playing():
-        await ctx.send('Already playing a song. Try using -q or -queue to queue a song :thumbsup:')
+        await ctx.send(f'Searching: :mag_right: `{url}`')
+        video, source = search(url)
+        await ctx.send(f'Added `{video["title"]}` to queue :thumbsup:')
+        s_queue.append(video['title'])
     else:
         await ctx.send(f'Searching for: `{url}` :mag_right:')
         video, source = search(url)
@@ -456,25 +459,13 @@ async def play(ctx, *, url):
 def check_queue():
                            
     voice = get(client.voice_clients)
-    if len(queue) <= 0:
+    if len(s_queue) <= 0:
         pass
     else:
-        next_song = queue.pop(0)
+        next_song = s_queue.pop(0)
         video, source = search(next_song)
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
-
-
-@client.command(aliases=['q'])
-async def queue(ctx, *, url):
-    voice = get(client.voice_clients, guild=ctx.guild)                         
-    if voice.is_connected():
-        await ctx.send(f'Searching: :mag_right: `{url}`')
-        video, source = search(url)
-        await ctx.send(f'Found `{video["title"]}` :thumbsup:')
-        queue.append(video['title'])
-    else:
-        await ctx.send('Not in a voice channel')
 
 
 @client.command(aliases=['pa'])
@@ -501,11 +492,11 @@ async def skip(ctx):
     voice = get(client.voice_clients, guild=ctx.guild)
     role = discord.utils.get(ctx.guild.roles, name='DJ')
     if role in ctx.author.roles or ctx.message.author.guild_permissions.manage_channels:
-        if len(queue) <= 0:
+        if len(s_queue) <= 0:
             await ctx.send('No song in queue to skip to. Stopped the one currently playing')
             voice.stop()
         else:
-            next_song = queue[0]
+            next_song = s_queue[0]
             video, source = search(next_song)
             voice.stop()
             await ctx.send('**Skipped** :thumbsup:')
@@ -522,11 +513,11 @@ async def viewq(ctx):
     embed = discord.Embed(
         color=discord.Color.purple(), title='QUEUE'
     )
-    for i in range(0, len(queue)):
-        embed.add_field(name='Song ' + str(i+1), value=queue[i], inline=False)
+    for i in range(0, len(s_queue)):
+        embed.add_field(name='Song ' + str(i+1), value=s_queue[i], inline=False)
 
     await ctx.send(embed=embed)
 
-queue = []
+s_queue = []
 client.run(str(os.environ.get('token')))
 
