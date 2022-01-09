@@ -399,7 +399,6 @@ async def idjot(ctx, mem: discord.Member = None):
 async def leave(ctx):
 
     voice = get(client.voice_clients, guild=ctx.guild)
-
     if voice and voice.is_connected():
         await voice.disconnect()
         await ctx.send(':mailbox_with_no_mail: **Successfully disconnected**')
@@ -453,7 +452,7 @@ async def play(ctx, *, url):
         video, source = search(url)
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
-        now_playing.append(url)
+        now_playing.append(video["title"])
         await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
 
 
@@ -465,8 +464,8 @@ def check_queue():
         pass
     else:
         next_song = s_queue.pop(0)
-        now_playing.append(next_song)
         video, source = search(next_song)
+        now_playing.append(video["title"])
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
 
