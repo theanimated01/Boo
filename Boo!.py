@@ -115,7 +115,7 @@ async def add_experience(user, exp, message):
     last_msg = result[1]
     temp_exp = result[2]
     print(xp)
-    print(temo_exp)
+    print(temp_exp)
     print(last_msg)
     print(user.id)
     print(message)
