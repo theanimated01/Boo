@@ -527,6 +527,7 @@ async def lyrics(ctx):
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
             if not 200 <= r.status <= 299:
+                await ctx.send("Lyrics not found")
                 pass
             data = await r.json()
             
