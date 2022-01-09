@@ -114,6 +114,7 @@ async def add_experience(user, exp, message):
     xp = result[0]
     last_msg = result[1]
     temp_exp = result[2]
+    print((time.time() - last_msg)>60)
     if time.time() - last_msg > 60:
         xp += exp
         temp_exp += exp
