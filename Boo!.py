@@ -13,9 +13,11 @@ from discord.utils import get
 from discord import FFmpegPCMAudio
 intents=discord.Intents.default()
 intents.members=True
+#db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+
 
 def get_prefix(client, message):
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT prefix FROM prefixes WHERE guild_id = "{message.guild.id}"')
     result = cursor.fetchone()
@@ -34,7 +36,7 @@ async def on_ready():
     
 @client.event
 async def on_guild_join(guild):
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     sql = (f'INSERT INTO prefixes (guild_id, prefix) VALUES(%s, %s)')
     val = (guild.id, '_')
@@ -43,7 +45,7 @@ async def on_guild_join(guild):
 
 @client.event
 async def on_guild_remove(guild):
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'DELETE FROM prefixes WHERE guild_id = "{guild.id}"')
     
@@ -51,7 +53,7 @@ async def on_guild_remove(guild):
 @client.command()
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, *, prefix):
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     sql = (f'UPDATE prefixes SET prefix = %s WHERE guild_id = %s')
     val = (prefix, ctx.guild.id)
@@ -79,7 +81,7 @@ async def on_message(message):
     await client.process_commands(message)
 
 async def check_user(message):
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE guild_id = "{message}"')
     result = cursor.fetchall()
@@ -92,7 +94,7 @@ async def check_user(message):
     
 async def update_data(user, message):
     guild = client.get_guild(message)
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
     result = cursor.fetchone()
@@ -105,7 +107,7 @@ async def update_data(user, message):
 
 async def add_experience(user, exp, message):
 
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, last_msg, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{message}"')
     result = cursor.fetchone()
@@ -124,7 +126,7 @@ async def add_experience(user, exp, message):
 
 async def level_up(user, message, msg):
 
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT exp, level, temp_exp FROM users WHERE user_id = "{user.id}" and guild_id = "{msg}"')
     result = cursor.fetchone()
@@ -148,7 +150,7 @@ async def level_up(user, message, msg):
 async def leaderboard(ctx):
     guild_id = ctx.guild.id
     guild = client.get_guild(guild_id)
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id, exp, level FROM users WHERE guild_id = "{guild_id}" ORDER BY exp DESC')
     result = cursor.fetchmany(10)
@@ -174,7 +176,7 @@ async def rank(ctx, member: discord.Member = None):
 
     if member is None:
 
-        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+        db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
         cursor = db.cursor()
         id_1 = ctx.message.author.id
         cursor.execute(f'SELECT exp, level, temp_exp, on_lvl_up FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
@@ -231,7 +233,7 @@ async def rank(ctx, member: discord.Member = None):
         
     else:
 
-        db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+        db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
         cursor = db.cursor()
         id_1 = member.id
         cursor.execute(f'SELECT exp, level, temp_exp, on_lvl_up FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
@@ -296,7 +298,7 @@ async def on_command_error(ctx, error):
 @client.command()
 async def help(ctx):
     
-    db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT prefix FROM prefixes WHERE guild_id = "{ctx.guild.id}"')
     result = cursor.fetchone()
