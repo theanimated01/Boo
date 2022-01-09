@@ -6,6 +6,7 @@ import requests
 import os
 import time
 import mysql.connector
+import aiohttp
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from discord.ext import commands, tasks
@@ -14,7 +15,6 @@ from discord import FFmpegPCMAudio
 intents=discord.Intents.default()
 intents.members=True
 #db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
-
 
 def get_prefix(client, message):
     db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
@@ -453,16 +453,19 @@ async def play(ctx, *, url):
         video, source = search(url)
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
+        now_playing.append(url)
         await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
 
 
 def check_queue():
-                           
+    
+    now_playing.clear()
     voice = get(client.voice_clients)
     if len(s_queue) <= 0:
         pass
     else:
         next_song = s_queue.pop(0)
+        now_playing.append(next_song)
         video, source = search(next_song)
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
@@ -507,8 +510,8 @@ async def skip(ctx):
         await ctx.send("Can't skip song as you do not have the DJ role or Manage Role permission")
 
 
-@client.command(aliases=['view'])
-async def viewq(ctx):
+@client.command(aliases=['q'])
+async def queue(ctx):
 
     embed = discord.Embed(
         color=discord.Color.purple(), title='QUEUE'
@@ -518,6 +521,32 @@ async def viewq(ctx):
 
     await ctx.send(embed=embed)
 
+    
+@client.command()
+async def lyrics(ctx):
+    x = now_playing[0]
+    async with ctx.typing():
+        async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
+            if not 200 <= r.status <= 299:
+                pass
+            data = await r.json()
+            
+            if len(data["lyrics"]) > 2000:
+                return await ctx.send(f'<{data["links"]["genius"]}>')
+            
+            embed = discord.Embed(
+                title=data["title"],
+                description=data["lyrics"],
+                colour=ctx.author.colour,
+            )
+            embed.set_thumbnail(url=data["thumbnail"]["genius"])
+            embed.set_author(name=data["author"])
+            await ctx.send(embed=embed)
+            
+            
+    
+LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
 s_queue = []
+now_playing=[]
 client.run(str(os.environ.get('token')))
 
