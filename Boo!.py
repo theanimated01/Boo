@@ -548,7 +548,11 @@ async def move(ctx, pos1, pos2):
     
     global s_queue
     
-    s_queue[pos1-1], s_queue[pos2-1] = s_queue[pos2-1], s_queue[pos1-1] 
+    print(s_queue)
+    n1=pos1-1
+    n2=pos2-1
+    s_queue[n1], s_queue[n2] = s_queue[n2], s_queue[n1] 
+    print(s_queue)
     await ctx.send(f"Switched {pos1} and {pos2} :thumbsup:")
     embed = discord.Embed(
         color=discord.Color.purple(), title='QUEUE'
@@ -560,7 +564,7 @@ async def move(ctx, pos1, pos2):
     
     
 @client.command(aliases=['sh'])
-async def shuffle(ctx, pos1, pos2):
+async def shuffle(ctx):
     
     global s_queue
     
