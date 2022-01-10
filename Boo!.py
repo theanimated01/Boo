@@ -24,6 +24,9 @@ def get_prefix(client, message):
     return result
 
 
+LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
+s_queue = []
+now_playing=[]
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
 client.remove_command('help')
 
@@ -397,13 +400,18 @@ async def idjot(ctx, mem: discord.Member = None):
 
 @client.command(aliases=['dc', 'disconnect'])
 async def leave(ctx):
-
+    
+    global s_queue
+    global now_playing
+    
     voice = get(client.voice_clients, guild=ctx.guild)
     if voice and voice.is_connected():
         await voice.disconnect()
         await ctx.send(':mailbox_with_no_mail: **Successfully disconnected**')
     else:
         await ctx.send('I am not in any voice channel currently')
+    s_queue.clear()
+    now_playing.clear()
 
 
 def search(query):
@@ -434,6 +442,10 @@ FFMPEG_OPTS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_
 
 @client.command(aliases=['p'])
 async def play(ctx, *, url):
+    
+    global s_queue
+    global now_playing
+    
     channel = ctx.message.author.voice.channel
     voice = get(client.voice_clients, guild=ctx.guild)
     if voice and voice.is_connected():
@@ -457,6 +469,9 @@ async def play(ctx, *, url):
 
 
 def check_queue():
+    
+    global s_queue
+    global now_playing
     
     now_playing.clear()
     voice = get(client.voice_clients)
@@ -490,7 +505,11 @@ async def resume(ctx):
                    
 @client.command(aliases=['s'])
 async def skip(ctx):
-
+    
+    global s_queue
+    global now_playing
+    
+    now_playing.clear()
     voice = get(client.voice_clients, guild=ctx.guild)
     role = discord.utils.get(ctx.guild.roles, name='DJ')
     if role in ctx.author.roles or ctx.message.author.guild_permissions.manage_channels:
@@ -498,9 +517,10 @@ async def skip(ctx):
             await ctx.send('No song in queue to skip to. Stopped the one currently playing')
             voice.stop()
         else:
-            next_song = s_queue[0]
+            next_song = s_queue.pop(0)
             video, source = search(next_song)
             voice.stop()
+            now_playing.append(video["title"])
             await ctx.send('**Skipped** :thumbsup:')
             await ctx.send(f'Playing :notes: `{video["title"]}` - Now!')
             voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
@@ -511,7 +531,9 @@ async def skip(ctx):
 
 @client.command(aliases=['q'])
 async def queue(ctx):
-
+    
+    global s_queue
+    
     embed = discord.Embed(
         color=discord.Color.purple(), title='QUEUE'
     )
@@ -520,10 +542,48 @@ async def queue(ctx):
 
     await ctx.send(embed=embed)
 
+
+@client.command(aliases=['m'])
+async def move(ctx, pos1, pos2):
+    
+    global s_queue
+    
+    s_queue[pos1-1], s_queue[pos2-1] = s_queue[pos2-1], s_queue[pos1-1] 
+    await ctx.send(f"Switched {pos1} and {pos2} :thumbsup:")
+    embed = discord.Embed(
+        color=discord.Color.purple(), title='QUEUE'
+    )
+    for i in range(0, len(s_queue)):
+        embed.add_field(name='Song ' + str(i+1), value=s_queue[i], inline=False)
+
+    await ctx.send(embed=embed)
+    
+    
+@client.command(aliases=['sh'])
+async def shuffle(ctx, pos1, pos2):
+    
+    global s_queue
+    
+    random.shuffle(s_queue)
+    await ctx.send(f"Shuffled :thumbsup:")
+    embed = discord.Embed(
+        color=discord.Color.purple(), title='QUEUE'
+    )
+    for i in range(0, len(s_queue)):
+        embed.add_field(name='Song ' + str(i+1), value=s_queue[i], inline=False)
+
+    await ctx.send(embed=embed)
+    
     
 @client.command()
-async def lyrics(ctx):
-    x = now_playing[0]
+async def lyrics(ctx, name=None):
+    
+    global now_playing
+    
+    if name is None:
+        x = now_playing[0]
+    else:
+        x = name
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
             if not 200 <= r.status <= 299:
@@ -543,10 +603,6 @@ async def lyrics(ctx):
             embed.set_author(name=data["author"])
             await ctx.send(embed=embed)
             
-            
-    
-LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
-s_queue = []
-now_playing=[]
+
 client.run(str(os.environ.get('token')))
 
