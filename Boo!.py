@@ -533,13 +533,18 @@ async def skip(ctx):
 async def queue(ctx):
     
     global s_queue
+    global now_playing
     
+    if len(s_queue)>10:
+        qnum = 10
+    else:
+        qnum = len(s_queue)
     embed = discord.Embed(
-        color=discord.Color.purple(), title='QUEUE'
+        color=ctx.author.colour, title='QUEUE', description='Showing upto next 10 track'
     )
-    for i in range(0, len(s_queue)):
-        embed.add_field(name='Song ' + str(i+1), value=s_queue[i], inline=False)
-
+    embed.add_field(name='Currently Playing', value=now_playing[0], inline=False)
+    embed.add_field(name='Next Up', value="\n".join(for i in s_queue[:qnum]), inline=False)
+    
     await ctx.send(embed=embed)
 
 
