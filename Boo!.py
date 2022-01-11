@@ -556,6 +556,7 @@ async def move(ctx, pos1, pos2):
     print(s_queue)
     n1=pos1-1
     n2=pos2-1
+    print(n1,n2)
     s_queue[n1], s_queue[n2] = s_queue[n2], s_queue[n1] 
     print(s_queue)
     await ctx.send(f"Switched {pos1} and {pos2} :thumbsup:")
@@ -589,9 +590,11 @@ async def lyrics(ctx):
     
     global now_playing
     
-    name = now_playing[0]
-    temp = name.split()
-    x = temp[0] + temp[1] + temp[2]
+    temp1 = now_playing[0]
+    temp2 = temp1.split("-")
+    temp3 = temp2[1]
+    temp4 = temp3.split()
+    x = temp4[0] + temp2[0]
     print(x)
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
