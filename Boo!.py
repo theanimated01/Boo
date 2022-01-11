@@ -585,11 +585,14 @@ async def shuffle(ctx):
     
     
 @client.command()
-async def lyrics(ctx, name=None):
+async def lyrics(ctx):
     
     global now_playing
     
-    x = now_playing[0]
+    name = now_playing[0]
+    temp = name.split()
+    x = temp[0] + temp[1]
+    print(x)
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
             if not 200 <= r.status <= 299:
