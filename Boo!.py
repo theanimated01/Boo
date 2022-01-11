@@ -327,9 +327,10 @@ async def help(ctx):
     embed.add_field(name=f'`{pre}8ball`', value='just your standard 8ball', inline=False)
     embed.add_field(name=f'`{pre}clear`', value='clears a particular amount of messages. (must have manage message permission)', inline=False)
     embed.add_field(name=f'`{pre}idjot`', value='Your standard idjot command to call someone an IDJOT. kekw', inline=False)
-    embed.add_field(name=f'`{pre}play` or `{pre}p`', value='Plays a song (does not work with spotify yet)', inline=False)
-    embed.add_field(name=f'`{pre}queue` or `{pre}q`', value='Add a song to queue', inline=False)
-    embed.add_field(name=f'`{pre}viewq` or `{pre}view`', value='Shows songs in queue', inline=False)
+    embed.add_field(name=f'`{pre}play` or `{pre}p`', value='Plays a song. If one is already playing, adds song to queue', inline=False)
+    embed.add_field(name=f'`{pre}queue` or `{pre}q`', value='Shows songs in queue', inline=False)
+    embed.add_field(name=f'`{pre}move` or `{pre}m`', value='Takes two numbers (seperated by a space) and replaces the position of the songs in the position', inline=False)
+    embed.add_field(name=f'`{pre}shuffle` or `{pre}sh`', value='Shuffles songs in queue', inline=False)
     embed.add_field(name=f'`{pre}pause` or `{pre}pa`', value='Pauses the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}resume` or `{pre}r`', value='Resumes the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}skip` or `{pre}s`', value='Skips the song playing and plays next song in queue', inline=False)
@@ -511,8 +512,7 @@ async def play(ctx, *, url):
             await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
 
             
-@client.command()
-async def next_song(ctx):
+def check_queue():
     
     global s_queue
     global now_playing
@@ -525,14 +525,8 @@ async def next_song(ctx):
         next_song = s_queue.pop(0)
         video, source = search(next_song)
         now_playing.append(video["title"])
-        await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
-    
-    
-def check_queue():
-    
-    await next_song()
     
 
 @client.command(aliases=['pa'])
