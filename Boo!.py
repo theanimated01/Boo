@@ -554,8 +554,9 @@ async def move(ctx, pos1, pos2):
     global s_queue
     
     print(s_queue)
-    n1=pos1-1
-    n2=pos2-1
+    print(pos1, pos2)
+    n1=int(pos1)-1
+    n2=int(pos2)-1
     print(n1,n2)
     s_queue[n1], s_queue[n2] = s_queue[n2], s_queue[n1] 
     print(s_queue)
@@ -606,9 +607,6 @@ async def lyrics(ctx):
                 await ctx.send("Lyrics not found")
                 pass
             data = await r.json()
-            
-            if len(data["lyrics"]) > 2000:
-                return await ctx.send(f'<{data["links"]["genius"]}>')
             
             embed = discord.Embed(
                 title=data["title"],
