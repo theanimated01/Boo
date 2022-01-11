@@ -7,6 +7,8 @@ import os
 import time
 import mysql.connector
 import aiohttp
+from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from discord.ext import commands, tasks
@@ -446,26 +448,69 @@ async def play(ctx, *, url):
     global s_queue
     global now_playing
     
-    channel = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild=ctx.guild)
-    if voice and voice.is_connected():
-        pass
-    else:
-        voice = await channel.connect()
-        await ctx.send(f'Successfully joined `{channel}`')
+    temp1=url.split('/')
+    
+    if len(temp1)>=2:
+            
+        temp2=temp1[4]
+        temp3=temp2.split('?')
+        playlist_id=temp3[0]
+            
+        client_credentials_manager = SpotifyClientCredentials(client_id='e2f7b7a3f80f4d9782b16f13a0d25115', client_secret='f9d8990248824bf39de37d7def65260a')
+        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-    if voice.is_playing():
-        await ctx.send(f'Searching: :mag_right: `{url}`')
-        video, source = search(url)
-        await ctx.send(f'Added `{video["title"]}` to queue :thumbsup:')
-        s_queue.append(video['title'])
+        results = sp.playlist(playlist_id)
+
+        for i in range(len(results['tracks']['items'])):
+            s_queue.append(results['tracks']['items'][i]['track']['name'], results['tracks']['items'][i]['track']['album']['artists'][0]['name'])
+            
+        channel = ctx.message.author.voice.channel
+        voice = get(client.voice_clients, guild=ctx.guild)
+        if voice and voice.is_connected():
+            pass
+        else:
+            voice = await channel.connect()
+            await ctx.send(f'Successfully joined `{channel}`')
+        
+        if voice.is_playing():
+            for i in range(len(results['tracks']['items'])):
+                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
+            await ctx.send('Added playlist to queue :white_check_mark:')
+            
+        else:
+            for i in range(len(results['tracks']['items'])):
+                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
+            u=s_queue.pop(0)
+            await ctx.send(f'Searching for: `{u}` :mag_right:')
+            video, source = search(u)
+            voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
+            voice.is_playing()
+            now_playing.append(video["title"])
+            await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
+                
     else:
-        await ctx.send(f'Searching for: `{url}` :mag_right:')
-        video, source = search(url)
-        voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
-        voice.is_playing()
-        now_playing.append(video["title"])
-        await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
+        
+        u=url
+        channel = ctx.message.author.voice.channel
+        voice = get(client.voice_clients, guild=ctx.guild)
+        if voice and voice.is_connected():
+            pass
+        else:
+            voice = await channel.connect()
+            await ctx.send(f'Successfully joined `{channel}`')
+
+        if voice.is_playing():
+            await ctx.send(f'Searching: :mag_right: `{u}`')
+            video, source = search(u)
+            await ctx.send(f'Added `{video["title"]}` to queue :thumbsup:')
+            s_queue.append(video['title'])
+        else:
+            await ctx.send(f'Searching for: `{u}` :mag_right:')
+            video, source = search(u)
+            voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
+            voice.is_playing()
+            now_playing.append(video["title"])
+            await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
 
 
 def check_queue():
