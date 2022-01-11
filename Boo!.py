@@ -589,10 +589,7 @@ async def lyrics(ctx, name=None):
     
     global now_playing
     
-    if name is None:
-        x = now_playing[0]
-    else:
-        x = name
+    x = now_playing[0]
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
             if not 200 <= r.status <= 299:
