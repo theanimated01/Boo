@@ -552,21 +552,23 @@ async def queue(ctx):
 async def move(ctx, pos1, pos2):
     
     global s_queue
-    
-    print(s_queue)
-    print(pos1, pos2)
+    global now_playing
+
     n1=int(pos1)-1
     n2=int(pos2)-1
-    print(n1,n2)
     s_queue[n1], s_queue[n2] = s_queue[n2], s_queue[n1] 
-    print(s_queue)
-    await ctx.send(f"Switched {pos1} and {pos2} :thumbsup:")
+    await ctx.send(f"Switched song {pos1} and {pos2} :thumbsup:")
+    
+    if len(s_queue)>10:
+        qnum = 10
+    else:
+        qnum = len(s_queue)
     embed = discord.Embed(
-        color=discord.Color.purple(), title='QUEUE'
+        color=ctx.author.colour, title='QUEUE', description='Showing upto next 10 track'
     )
-    for i in range(0, len(s_queue)):
-        embed.add_field(name='Song ' + str(i+1), value=s_queue[i], inline=False)
-
+    embed.add_field(name='Currently Playing', value=now_playing[0], inline=False)
+    embed.add_field(name='Next Up', value="\n".join(i for i in s_queue[:qnum]), inline=False)
+    
     await ctx.send(embed=embed)
     
     
@@ -592,15 +594,11 @@ async def lyrics(ctx):
     global now_playing
     
     temp1 = now_playing[0]
-    print(temp1)
     temp2 = temp1.split("-")
-    print(temp2)
     temp3 = temp2[1]
-    print(temp3)
     temp4 = temp3.split()
-    print(temp4)
     x = temp4[0] + " " + temp2[0]
-    print(x)
+    
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
             if not 200 <= r.status <= 299:
