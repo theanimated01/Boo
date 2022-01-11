@@ -510,8 +510,9 @@ async def play(ctx, *, url):
             now_playing.append(video["title"])
             await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
 
-
-def check_queue():
+            
+@client.command()
+async def next_song(ctx):
     
     global s_queue
     global now_playing
@@ -524,9 +525,15 @@ def check_queue():
         next_song = s_queue.pop(0)
         video, source = search(next_song)
         now_playing.append(video["title"])
+        await ctx.send(f'Playing: :notes: `{video["title"]}` - Now!')
         voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
         voice.is_playing()
-
+    
+    
+def check_queue():
+    
+    await next_song()
+    
 
 @client.command(aliases=['pa'])
 async def pause(ctx):
@@ -619,15 +626,21 @@ async def move(ctx, pos1, pos2):
 async def shuffle(ctx):
     
     global s_queue
+    global now_playing
     
     random.shuffle(s_queue)
     await ctx.send(f"Shuffled :thumbsup:")
+    
+    if len(s_queue)>10:
+        qnum = 10
+    else:
+        qnum = len(s_queue)
     embed = discord.Embed(
-        color=discord.Color.purple(), title='QUEUE'
+        color=ctx.author.colour, title='QUEUE', description='Showing upto next 10 track'
     )
-    for i in range(0, len(s_queue)):
-        embed.add_field(name='Song ' + str(i+1), value=s_queue[i], inline=False)
-
+    embed.add_field(name='Currently Playing', value=now_playing[0], inline=False)
+    embed.add_field(name='Next Up', value="\n".join(i for i in s_queue[:qnum]), inline=False)
+    
     await ctx.send(embed=embed)
     
     
