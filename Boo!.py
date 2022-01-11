@@ -331,6 +331,7 @@ async def help(ctx):
     embed.add_field(name=f'`{pre}queue` or `{pre}q`', value='Shows songs in queue', inline=False)
     embed.add_field(name=f'`{pre}move` or `{pre}m`', value='Takes two numbers (seperated by a space) and replaces the position of the songs in the position', inline=False)
     embed.add_field(name=f'`{pre}shuffle` or `{pre}sh`', value='Shuffles songs in queue', inline=False)
+    embed.add_field(name=f'`{pre}lyrics` or `{pre}l`', value='Returns lyrics of the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}pause` or `{pre}pa`', value='Pauses the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}resume` or `{pre}r`', value='Resumes the song currently playing', inline=False)
     embed.add_field(name=f'`{pre}skip` or `{pre}s`', value='Skips the song playing and plays next song in queue', inline=False)
@@ -638,7 +639,7 @@ async def shuffle(ctx):
     await ctx.send(embed=embed)
     
     
-@client.command()
+@client.command(aliases=['l'])
 async def lyrics(ctx):
     
     global now_playing
