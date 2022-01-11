@@ -455,17 +455,15 @@ async def play(ctx, *, url):
         temp2=temp1[4]
         temp3=temp2.split('?')
         playlist_id=temp3[0]
-            
+        print(playlist_id)
         client_credentials_manager = SpotifyClientCredentials(client_id='e2f7b7a3f80f4d9782b16f13a0d25115', client_secret='f9d8990248824bf39de37d7def65260a')
         sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
         results = sp.playlist(playlist_id)
-
-        for i in range(len(results['tracks']['items'])):
-            s_queue.append(results['tracks']['items'][i]['track']['name'], results['tracks']['items'][i]['track']['album']['artists'][0]['name'])
             
         channel = ctx.message.author.voice.channel
         voice = get(client.voice_clients, guild=ctx.guild)
+        
         if voice and voice.is_connected():
             pass
         else:
