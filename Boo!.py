@@ -591,9 +591,13 @@ async def lyrics(ctx):
     global now_playing
     
     temp1 = now_playing[0]
+    print(temp1)
     temp2 = temp1.split("-")
+    print(temp2)
     temp3 = temp2[1]
+    print(temp3)
     temp4 = temp3.split()
+    print(temp4)
     x = temp4[0] + temp2[0]
     print(x)
     async with ctx.typing():
