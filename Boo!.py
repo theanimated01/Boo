@@ -470,14 +470,13 @@ async def play(ctx, *, url):
         
         if voice.is_playing():
             for i in range(len(results['tracks']['items'])):
-                print(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
-                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
+                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'] + '-' + results['tracks']['items'][i]['track']['name'])
             await ctx.send('Added playlist to queue :white_check_mark:')
             
         else:
             print(len(results['tracks']['items']))
             for i in range(len(results['tracks']['items'])):
-                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
+                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'] + '-' + results['tracks']['items'][i]['track']['name'])
             u=s_queue.pop(0)
             print(u)
             await ctx.send(f'Searching for: `{u}` :mag_right:')
