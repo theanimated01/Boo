@@ -543,7 +543,7 @@ async def queue(ctx):
         color=ctx.author.colour, title='QUEUE', description='Showing upto next 10 track'
     )
     embed.add_field(name='Currently Playing', value=now_playing[0], inline=False)
-    embed.add_field(name='Next Up', value="\n".join(for i in s_queue[:qnum]), inline=False)
+    embed.add_field(name='Next Up', value="\n".join(i for i in s_queue[:qnum]), inline=False)
     
     await ctx.send(embed=embed)
 
