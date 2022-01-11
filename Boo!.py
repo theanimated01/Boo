@@ -460,7 +460,8 @@ async def play(ctx, *, url):
         sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
         results = sp.playlist(playlist_id)
-            
+        print('reached')
+        print(results['tracks']['items'][0]['track']['name'])
         channel = ctx.message.author.voice.channel
         voice = get(client.voice_clients, guild=ctx.guild)
         
