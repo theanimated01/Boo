@@ -471,14 +471,16 @@ async def play(ctx, *, url):
             await ctx.send(f'Successfully joined `{channel}`')
         
         if voice.is_playing():
-            print('reached')
+            print('reached playing')
             for i in range(len(results['tracks']['items'])):
+                print(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
                 s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
             await ctx.send('Added playlist to queue :white_check_mark:')
             
         else:
-            print('reached')
+            print('reached start')
             for i in range(len(results['tracks']['items'])):
+                print(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
                 s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
             u=s_queue.pop(0)
             print(u)
