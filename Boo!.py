@@ -455,12 +455,10 @@ async def play(ctx, *, url):
         temp2=temp1[4]
         temp3=temp2.split('?')
         playlist_id=temp3[0]
-        print(playlist_id)
         client_credentials_manager = SpotifyClientCredentials(client_id='e2f7b7a3f80f4d9782b16f13a0d25115', client_secret='f9d8990248824bf39de37d7def65260a')
         sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
         results = sp.playlist(playlist_id)
-        print(results['tracks']['items'][0]['track']['name'])
         channel = ctx.message.author.voice.channel
         voice = get(client.voice_clients, guild=ctx.guild)
         
@@ -471,17 +469,15 @@ async def play(ctx, *, url):
             await ctx.send(f'Successfully joined `{channel}`')
         
         if voice.is_playing():
-            print('reached playing')
             for i in range(len(results['tracks']['items'])):
                 print(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
                 s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
             await ctx.send('Added playlist to queue :white_check_mark:')
             
         else:
-            print('reached start')
+            print(len(results['tracks']['items'])
             for i in range(len(results['tracks']['items'])):
-                print(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
-                s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
+                  s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
             u=s_queue.pop(0)
             print(u)
             await ctx.send(f'Searching for: `{u}` :mag_right:')
