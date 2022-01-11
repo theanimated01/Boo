@@ -591,7 +591,7 @@ async def lyrics(ctx):
     
     name = now_playing[0]
     temp = name.split()
-    x = temp[0] + temp[1]
+    x = temp[0] + temp[1] + temp[2]
     print(x)
     async with ctx.typing():
         async with aiohttp.request("GET", LYRICS_URL + x, headers={}) as r:
