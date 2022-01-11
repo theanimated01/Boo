@@ -2,7 +2,7 @@ discord.py
 discord.py[voice]
 ffmpeg
 PyNaCl
-youtube-dl[2021.4.1]
+youtube-dl[2021.12.17]
 pillow
 requests
 discord.py[FFmpegPCMAudio]
