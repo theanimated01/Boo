@@ -460,7 +460,6 @@ async def play(ctx, *, url):
         sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
         results = sp.playlist(playlist_id)
-        print('reached')
         print(results['tracks']['items'][0]['track']['name'])
         channel = ctx.message.author.voice.channel
         voice = get(client.voice_clients, guild=ctx.guild)
@@ -472,14 +471,17 @@ async def play(ctx, *, url):
             await ctx.send(f'Successfully joined `{channel}`')
         
         if voice.is_playing():
+            print('reached')
             for i in range(len(results['tracks']['items'])):
                 s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
             await ctx.send('Added playlist to queue :white_check_mark:')
             
         else:
+            print('reached')
             for i in range(len(results['tracks']['items'])):
                 s_queue.append(results['tracks']['items'][i]['track']['album']['artists'][0]['name'], '-', results['tracks']['items'][i]['track']['name'])
             u=s_queue.pop(0)
+            print(u)
             await ctx.send(f'Searching for: `{u}` :mag_right:')
             video, source = search(u)
             voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: check_queue())
