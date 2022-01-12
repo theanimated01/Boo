@@ -580,7 +580,7 @@ async def queue(ctx, qnum=10):
     global s_queue
     global now_playing
     
-    if len(s_queue)<10:
+    if len(s_queue)<qnum:
         qnum = len(s_queue)
     
     embed = discord.Embed(
