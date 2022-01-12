@@ -358,7 +358,8 @@ async def busy(ctx):
 @client.command(aliases=['hey', 'hello'])
 async def hi(ctx, mem: discord.Member = None):
     if mem is None:
-        await ctx.send(f'Hello IDJOT!')
+        msg = await ctx.send(f'Hello IDJOT!')
+        await msg.edit(content='test')
     else:
         await ctx.send(f'<@!{ctx.author.id}> says HIII! <@!{mem.id}>')
 
