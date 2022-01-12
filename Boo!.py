@@ -358,8 +358,7 @@ async def busy(ctx):
 @client.command(aliases=['hey', 'hello'])
 async def hi(ctx, mem: discord.Member = None):
     if mem is None:
-        msg = await ctx.send(f'Hello IDJOT!')
-        await msg.edit(content='test')
+        await ctx.send(f'Hello IDJOT!')
     else:
         await ctx.send(f'<@!{ctx.author.id}> says HIII! <@!{mem.id}>')
 
@@ -576,17 +575,16 @@ async def skip(ctx):
 
 
 @client.command(aliases=['q'])
-async def queue(ctx):
+async def queue(ctx, qnum=10):
     
     global s_queue
     global now_playing
     
-    if len(s_queue)>10:
-        qnum = 10
-    else:
+    if len(s_queue)<10:
         qnum = len(s_queue)
+    
     embed = discord.Embed(
-        color=ctx.author.colour, title='QUEUE', description='Showing upto next 10 track'
+        color=ctx.author.colour, title='QUEUE', description=f'Showing {qnum} tracks out of {len(s_queue)} tracks'
     )
     embed.add_field(name='Currently Playing', value=now_playing[0], inline=False)
     embed.add_field(name='Next Up', value="\n".join(i for i in s_queue[:qnum]), inline=False)
