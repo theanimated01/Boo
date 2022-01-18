@@ -7,6 +7,7 @@ import os
 import time
 import mysql.connector
 import aiohttp
+import DiscordUtils
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
 from PIL import Image, ImageDraw, ImageFont
