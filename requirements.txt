@@ -9,3 +9,5 @@ requests
 discord.py[FFmpegPCMAudio]
 colorlog
 mysql-connector-python
+DiscordUtils
+DiscordUtils[voice]
