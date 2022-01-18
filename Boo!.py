@@ -7,7 +7,6 @@ import os
 import time
 import mysql.connector
 import aiohttp
-import DiscordUtils
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
 from PIL import Image, ImageDraw, ImageFont
@@ -31,7 +30,6 @@ LYRICS_URL = "https://some-random-api.ml/lyrics?title="
 s_queue = []
 now_playing=[]
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
-music=DiscordUtils.Music()
 client.remove_command('help')
 
 
@@ -419,27 +417,8 @@ async def leave(ctx):
     s_queue.clear()
     now_playing.clear()
 
-    
-@client.command()
-async def join(ctx):
-    await ctx.author.voice.channel.connect()
-    await ctx.send('Joined vc')
-    
-    
-@client.command()
-async def play(ctx, *, url):
-    player=music.get_player(guild_id=ctx.guild.id)
-    if not player:
-        player=music.create_player(ctx)
-    if not ctx.voice_client.is_playing():
-        await player.queue(url, search=True)
-        song=await player.play()
-        await ctx.send(f'Playing - {song.name}')
-    else:
-        song=await player.queue(url, search=True)
-        await ctx.send(f'{song.name} added to queue')
         
-'''def search(query):
+def search(query):
 
     with ytdl:
         try:
@@ -684,8 +663,7 @@ async def lyrics(ctx):
             )
             embed.set_thumbnail(url=data["thumbnail"]["genius"])
             embed.set_author(name=data["author"])
-            await ctx.send(embed=embed)
-'''            
+            await ctx.send(embed=embed)           
 
 client.run(str(os.environ.get('token')))
 
