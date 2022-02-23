@@ -1,4 +1,5 @@
 import discord
+import pymongo
 import json
 import random
 import youtube_dl
@@ -14,6 +15,7 @@ from io import BytesIO
 from discord.ext import commands, tasks
 from discord.utils import get
 from discord import FFmpegPCMAudio
+from pymongo import MongoClient
 intents=discord.Intents.default()
 intents.members=True
 #db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
@@ -29,6 +31,9 @@ def get_prefix(client, message):
 LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
 s_queue = []
 now_playing=[]
+cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+db=cluster["xp_system"]
+col=db["users"]
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
 client.remove_command('help')
 
@@ -85,7 +90,59 @@ async def on_message(message):
 
     await client.process_commands(message)
 
+    
 async def check_user(message):
+    
+    result = col.find({'guild_id': f'{message}'})
+    guild = client.get_guild(message)
+    for i in result:
+        if guild.get_member(i['user_id']) is None:
+            col.delete_one({'guild_id': f'{message}', 'user_id':f"{i['user_id']"})
+        
+    
+async def update_data(user, message):
+    
+    guild = client.get_guild(message)
+    result = col.find_one('guild_id':f'{message}', 'user_id': f'{user.id}')
+    if result is None:
+        col.insert_one({'guild_id':f'{message}', 'user_id':f'{user.id}', 'exp':0, 'level':1, 'last_msg':0, 'temp_exp':0, 'on_lvl_up':0})
+    
+
+async def add_experience(user, exp, message):
+    
+    result = col.find_one('guild_id':f'{message}', 'user_id': f'{user.id}')
+    xp = result['exp']
+    last_msg = result['last_msg']
+    temp_exp = result['temp_exp']
+    level = result['level']
+    if level<5:
+        mult = 1
+    else:
+        mult = level//5
+    exp *= mult
+    if time.time() - last_msg > 60:
+        xp += exp
+        temp_exp += exp
+        last_msg = time.time()
+        col.update_one({'guild_id':f'{message}', 'user_id':f'{user.id}'},{"$set":{'exp': xp, 'temp_exp': temp_exp, 'last_msg': last_msg}})
+
+
+async def level_up(user, message, msg):
+
+    result = col.find_one('guild_id':f'{message}', 'user_id': f'{user.id}')
+    exp = result['exp']
+    on_lvl_up = exp
+    level = result['level']
+    temp_exp = result['temp_exp']
+    req_xp = int((level**4)+(level*100))
+    if temp_exp >= req_xp:
+        await message.channel.send(f'{user.mention} has leveled up to level {level+1}')
+        level += 1
+        temp_exp = 0
+        col.update_one({'guild_id':f'{message}', 'user_id':f'{user.id}'},{"$set":{'on_lvl_up': on_lvl_up, 'temp_exp': temp_exp, 'level': level}})
+
+
+'''async def check_user(message):
     db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
     cursor = db.cursor()
     cursor.execute(f'SELECT user_id FROM users WHERE guild_id = "{message}"')
@@ -154,7 +211,7 @@ async def level_up(user, message, msg):
         sql = 'UPDATE users SET temp_exp = %s, level = %s, on_lvl_up = %s WHERE user_id = %s and guild_id = %s'
         val = (temp_exp, level, on_lvl_up, user.id, msg)
         cursor.execute(sql, val)
-        db.commit()
+        db.commit()'''
 
 
 @client.command(aliases=['lb'])
