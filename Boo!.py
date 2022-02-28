@@ -25,9 +25,10 @@ def get_prefix(client, message):
     cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
-    result=col.find_one({'guild_id':f'{message.guild_id}'})
-    pre=result['prefix']
-    return pre
+    result=col.find_one({'guild_id':f'{message.guild.id}'})
+    if result is not None:
+        pre=result['prefix']
+        return pre
 
 
 LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
@@ -99,7 +100,7 @@ async def check_user(message):
     result = col.find({'guild_id': f'{message}'})
     guild = client.get_guild(message)
     for i in result:
-        if guild.get_member(i['user_id']) is None:
+        if guild.get_member(int(i['user_id'])) is None:
             col.delete_one({'guild_id': f'{message}', 'user_id':f"{i['user_id']}"})
         
     
@@ -120,20 +121,21 @@ async def add_experience(user, exp, message):
     db=cluster["xp_system"]
     col=db["users"]
     result = col.find_one({'guild_id':f'{message}', 'user_id': f'{user.id}'})
-    xp = result['exp']
-    last_msg = result['last_msg']
-    temp_exp = result['temp_exp']
-    level = result['level']
-    if level<5:
-        mult = 1
-    else:
-        mult = level//5
-    exp *= mult
-    if time.time() - last_msg > 60:
-        xp += exp
-        temp_exp += exp
-        last_msg = time.time()
-        col.update_one({'guild_id':f'{message}', 'user_id':f'{user.id}'},{"$set":{'exp': xp, 'temp_exp': temp_exp, 'last_msg': last_msg}})
+    if result is not None:
+        xp = result['exp']
+        last_msg = result['last_msg']
+        temp_exp = result['temp_exp']
+        level = result['level']
+        if level<5:
+            mult = 1
+        else:
+            mult = level//5
+        exp *= mult
+        if time.time() - last_msg > 60:
+            xp += exp
+            temp_exp += exp
+            last_msg = time.time()
+            col.update_one({'guild_id':f'{message}', 'user_id':f'{user.id}'},{"$set":{'exp': xp, 'temp_exp': temp_exp, 'last_msg': last_msg}})
 
 
 async def level_up(user, message, msg):
@@ -141,17 +143,18 @@ async def level_up(user, message, msg):
     cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["users"]
-    result = col.find_one({'guild_id':f'{message}', 'user_id': f'{user.id}'})
-    exp = result['exp']
-    on_lvl_up = exp
-    level = result['level']
-    temp_exp = result['temp_exp']
-    req_xp = int((level**4)+(level*100))
-    if temp_exp >= req_xp:
-        await message.channel.send(f'{user.mention} has leveled up to level {level+1}')
-        level += 1
-        temp_exp = 0
-        col.update_one({'guild_id':f'{message}', 'user_id':f'{user.id}'},{"$set":{'on_lvl_up': on_lvl_up, 'temp_exp': temp_exp, 'level': level}})
+    result = col.find_one({'guild_id':f'{msg}', 'user_id': f'{user.id}'})
+    if result is not None:
+        exp = result['exp']
+        on_lvl_up = exp
+        level = result['level']
+        temp_exp = result['temp_exp']
+        req_xp = int((level**4)+(level*100))
+        if temp_exp >= req_xp:
+            await message.channel.send(f'{user.mention} has leveled up to level {level+1}')
+            level += 1
+            temp_exp = 0
+            col.update_one({'guild_id':f'{msg}', 'user_id':f'{user.id}'},{"$set":{'on_lvl_up': on_lvl_up, 'temp_exp': temp_exp, 'level': level}})
 
 
 @client.command(aliases=['lb'])
@@ -161,25 +164,21 @@ async def leaderboard(ctx):
     cluster = MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db = cluster["xp_system"]
     col = db["users"]
-    result = col.find({'guild_id':'742269484785729647'}).sort('exp',-1)
+    result = col.find({'guild_id':f'{guild_id}'}).sort('exp',-1).limit(10)
     embed = discord.Embed(title='LEADERBOARD', color=discord.Color.purple(), url='http://allnewsnow.online/l/boo-leaderboard')
     embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
-    for i in range(10):
-        if guild.get_member(result[i]['user_id']) is not None:
-            varvar = await client.fetch_user(result[i]['user_id'])
-            exp = result[i]['exp']
-            level = result[i]['level']
-            embed.add_field(name=varvar, value=f'exp - {exp}, \t level - {level}', inline=False)
+    for i in result:
+        varvar = await client.fetch_user(i['user_id'])
+        exp = i['exp']
+        level = i['level']
+        embed.add_field(name=varvar, value=f'exp - {exp}, \t level - {level}', inline=False)
     
     await ctx.send(embed=embed)
 
 @client.command()
 async def test(ctx):
     guild=client.get_guild(ctx.guild.id)
-    if guild.get_member(432337328694886408) is None:
-        await ctx.send('None')
-    else:
-        await ctx.send('Not None')
+    print(guild.get_member(432337328694886408))
     
 @client.command()
 async def rank(ctx, member: discord.Member = None):
@@ -259,7 +258,7 @@ async def rank(ctx, member: discord.Member = None):
             xp=xp1 + '.' + xp2[0] + 'K'
         else:
             xp=exp
-
+        
         bg = Image.open('Rank Card(1).png')
         asset = member.avatar_url_as(size=128)
         data = BytesIO(await asset.read())
@@ -663,6 +662,7 @@ async def lyrics(ctx):
             embed.set_thumbnail(url=data["thumbnail"]["genius"])
             embed.set_author(name=data["author"])
             await ctx.send(embed=embed)           
+
 
 client.run(str(os.environ.get('token')))
 
