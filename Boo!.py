@@ -51,7 +51,7 @@ async def on_guild_join(guild):
     cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
-    col.insert_one({'guild_id':f'{guild.id}', 'prefix'='_'})
+    col.insert_one({'guild_id':f'{guild.id}', 'prefix':'_'})
 
 
 @client.event
