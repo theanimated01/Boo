@@ -10,3 +10,4 @@ discord.py[FFmpegPCMAudio]
 colorlog
 mysql-connector-python
 pymongo
+pymongo[srv]
