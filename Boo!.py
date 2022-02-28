@@ -19,6 +19,7 @@ from pymongo import MongoClient
 intents=discord.Intents.default()
 intents.members=True
 #db = mysql.connector.connect(host='eu-cdbr-west-03.cleardb.net', user='b835d547697774', password='450bb570', database='heroku_43a797bed744649')
+#db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
 
 def get_prefix(client, message):
     db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
@@ -92,7 +93,10 @@ async def on_message(message):
 
     
 async def check_user(message):
-    
+
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["users"]
     result = col.find({'guild_id': f'{message}'})
     guild = client.get_guild(message)
     for i in result:
@@ -101,16 +105,22 @@ async def check_user(message):
         
     
 async def update_data(user, message):
-    
+
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["users"]
     guild = client.get_guild(message)
-    result = col.find_one('guild_id':f'{message}', 'user_id': f'{user.id}')
+    result = col.find_one({'guild_id':f'{message}', 'user_id': f'{user.id}'})
     if result is None:
         col.insert_one({'guild_id':f'{message}', 'user_id':f'{user.id}', 'exp':0, 'level':1, 'last_msg':0, 'temp_exp':0, 'on_lvl_up':0})
     
 
 async def add_experience(user, exp, message):
-    
-    result = col.find_one('guild_id':f'{message}', 'user_id': f'{user.id}')
+
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["users"]
+    result = col.find_one({'guild_id':f'{message}', 'user_id': f'{user.id}'})
     xp = result['exp']
     last_msg = result['last_msg']
     temp_exp = result['temp_exp']
@@ -129,7 +139,10 @@ async def add_experience(user, exp, message):
 
 async def level_up(user, message, msg):
 
-    result = col.find_one('guild_id':f'{message}', 'user_id': f'{user.id}')
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["users"]
+    result = col.find_one({'guild_id':f'{message}', 'user_id': f'{user.id}'})
     exp = result['exp']
     on_lvl_up = exp
     level = result['level']
@@ -146,17 +159,17 @@ async def level_up(user, message, msg):
 async def leaderboard(ctx):
     guild_id = ctx.guild.id
     guild = client.get_guild(guild_id)
-    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-    cursor = db.cursor()
-    cursor.execute(f'SELECT user_id, exp, level FROM users WHERE guild_id = "{guild_id}" ORDER BY exp DESC')
-    result = cursor.fetchmany(10)
+    cluster = MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db = cluster["xp_system"]
+    col = db["users"]
+    result = col.find({'guild_id':'742269484785729647'}).sort('exp',-1)
     embed = discord.Embed(title='LEADERBOARD', color=discord.Color.purple(), url='http://allnewsnow.online/l/boo-leaderboard')
     embed.set_thumbnail(url='https://cdn.discordapp.com/avatars/809469105789993032/2348d58f6dd45965dd884a70ebcfcf26.png?size=256')
-    for i in result:
-        if guild.get_member(i[0]) is not None:
-            varvar = await client.fetch_user(i[0])
-            embed.add_field(name=varvar, value=f'exp - {i[1]}, \t level - {i[2]}', inline=False)
-
+    for i in range(10):
+        if guild.get_member(result[i]['user_id']) is not None:
+            varvar = await client.fetch_user(result[i]['user_id'])
+            embed.add_field(name=varvar, value=f'exp - {result[i]['exp']}, \t level - {result[i]['level']}', inline=False)
+    
     await ctx.send(embed=embed)
 
 @client.command()
