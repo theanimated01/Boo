@@ -22,11 +22,12 @@ intents.members=True
 #db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
 
 def get_prefix(client, message):
-    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-    cursor = db.cursor()
-    cursor.execute(f'SELECT prefix FROM prefixes WHERE guild_id = "{message.guild.id}"')
-    result = cursor.fetchone()
-    return result
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["prefixes"]
+    result=col.find_one({'guild_id':f'{message.guild_id}'})
+    pre=result['prefix']
+    return pre
 
 
 LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
@@ -47,29 +48,27 @@ async def on_ready():
     
 @client.event
 async def on_guild_join(guild):
-    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-    cursor = db.cursor()
-    sql = (f'INSERT INTO prefixes (guild_id, prefix) VALUES(%s, %s)')
-    val = (guild.id, '_')
-    cursor.execute(sql, val)
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["prefixes"]
+    col.insert_one({'guild_id':f'{guild.id}', 'prefix'='_'})
 
 
 @client.event
 async def on_guild_remove(guild):
-    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-    cursor = db.cursor()
-    cursor.execute(f'DELETE FROM prefixes WHERE guild_id = "{guild.id}"')
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["prefixes"]
+    col.delete_one({'guild_id': f'{guild.id}'})
     
     
 @client.command()
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, *, prefix):
-    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-    cursor = db.cursor()
-    sql = (f'UPDATE prefixes SET prefix = %s WHERE guild_id = %s')
-    val = (prefix, ctx.guild.id)
-    cursor.execute(sql, val)
-    db.commit()
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["prefixes"]
+    col.update_one({'guild_id':f'{ctx.guild.id}'},{"$set":{'prefix': f'{prefix}'})
     
     
 @client.event
@@ -185,15 +184,15 @@ async def rank(ctx, member: discord.Member = None):
 
     if member is None:
 
-        db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-        cursor = db.cursor()
+        cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+        db=cluster["xp_system"]
+        col=db["users"]
         id_1 = ctx.message.author.id
-        cursor.execute(f'SELECT exp, level, temp_exp, on_lvl_up FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
-        result = cursor.fetchone()
-        exp = int(result[0])
-        lvl = int(result[1])
-        temp_exp = int(result[2])
-        on_lvl_up = int(result[3])
+        result = col.find_one('guild_id':f'{ctx.guild.id}', 'user_id': f'{id_1}')
+        exp = int(result['exp'])
+        lvl = int(result['level'])
+        temp_exp = int(result['temp_exp'])
+        on_lvl_up = int(result['on_lvl_up'])
         
         if exp>=1000:
             xp1=str(int(exp/1000))
@@ -242,15 +241,15 @@ async def rank(ctx, member: discord.Member = None):
         
     else:
 
-        db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-        cursor = db.cursor()
+        cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+        db=cluster["xp_system"]
+        col=db["users"]
         id_1 = member.id
-        cursor.execute(f'SELECT exp, level, temp_exp, on_lvl_up FROM users WHERE user_id = "{id_1}" and guild_id = "{ctx.guild.id}"')
-        result = cursor.fetchone()
-        exp = int(result[0])
-        lvl = int(result[1])
-        temp_exp = int(result[2])
-        on_lvl_up = int(result[3])
+        result = col.find_one('guild_id':f'{ctx.guild.id}', 'user_id': f'{id_1}')
+        exp = int(result['exp'])
+        lvl = int(result['level'])
+        temp_exp = int(result['temp_exp'])
+        on_lvl_up = int(result['on_lvl_up'])
         
         if exp>=1000:
             xp1=str(int(exp/1000))
@@ -307,11 +306,11 @@ async def on_command_error(ctx, error):
 @client.command()
 async def help(ctx):
     
-    db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
-    cursor = db.cursor()
-    cursor.execute(f'SELECT prefix FROM prefixes WHERE guild_id = "{ctx.guild.id}"')
-    result = cursor.fetchone()
-    pre = result[0]
+    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    db=cluster["xp_system"]
+    col=db["prefixes"]
+    result=col.find_one({'guild_id':f'{ctx.guild.id}'})
+    pre = result['prefix']
     embed = discord.Embed(
         color= discord.Color.purple()
     )
