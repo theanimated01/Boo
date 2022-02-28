@@ -100,7 +100,7 @@ async def check_user(message):
     guild = client.get_guild(message)
     for i in result:
         if guild.get_member(i['user_id']) is None:
-            col.delete_one({'guild_id': f'{message}', 'user_id':f"{i['user_id']"})
+            col.delete_one({'guild_id': f'{message}', 'user_id':f"{i['user_id']}"})
         
     
 async def update_data(user, message):
