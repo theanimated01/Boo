@@ -167,7 +167,9 @@ async def leaderboard(ctx):
     for i in range(10):
         if guild.get_member(result[i]['user_id']) is not None:
             varvar = await client.fetch_user(result[i]['user_id'])
-            embed.add_field(name=varvar, value=f'exp - {result[i]['exp']}, \t level - {result[i]['level']}', inline=False)
+            exp = result[i]['exp']
+            level = result[i]['level']
+            embed.add_field(name=varvar, value=f'exp - {exp}, \t level - {level}', inline=False)
     
     await ctx.send(embed=embed)
 
