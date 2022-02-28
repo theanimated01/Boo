@@ -68,7 +68,7 @@ async def prefix(ctx, *, prefix):
     cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
-    col.update_one({'guild_id':f'{ctx.guild.id}'},{"$set":{'prefix': f'{prefix}'})
+    col.update_one({'guild_id':f'{ctx.guild.id}'},{"$set":{'prefix': f'{prefix}'}})
     
     
 @client.event
