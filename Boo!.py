@@ -22,7 +22,7 @@ intents.members=True
 #db = mysql.connector.connect(host='sql6.freemysqlhosting.net', user='sql6464415', password='yzsxxdMaTC', database='sql6464415')
 
 def get_prefix(client, message):
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
     result=col.find_one({'guild_id':f'{message.guild.id}'})
@@ -34,7 +34,7 @@ def get_prefix(client, message):
 LYRICS_URL = "https://some-random-api.ml/lyrics?title="  
 s_queue = []
 now_playing=[]
-cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
 db=cluster["xp_system"]
 col=db["users"]
 client = commands.Bot(command_prefix=get_prefix, intents=intents)
@@ -49,7 +49,7 @@ async def on_ready():
     
 @client.event
 async def on_guild_join(guild):
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
     col.insert_one({'guild_id':f'{guild.id}', 'prefix':'_'})
@@ -57,7 +57,7 @@ async def on_guild_join(guild):
 
 @client.event
 async def on_guild_remove(guild):
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
     col.delete_one({'guild_id': f'{guild.id}'})
@@ -66,7 +66,7 @@ async def on_guild_remove(guild):
 @client.command()
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, *, prefix):
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
     col.update_one({'guild_id':f'{ctx.guild.id}'},{"$set":{'prefix': f'{prefix}'}})
@@ -94,7 +94,7 @@ async def on_message(message):
     
 async def check_user(message):
 
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["users"]
     result = col.find({'guild_id': f'{message}'})
@@ -106,7 +106,7 @@ async def check_user(message):
     
 async def update_data(user, message):
 
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["users"]
     guild = client.get_guild(message)
@@ -117,7 +117,7 @@ async def update_data(user, message):
 
 async def add_experience(user, exp, message):
 
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["users"]
     result = col.find_one({'guild_id':f'{message}', 'user_id': f'{user.id}'})
@@ -140,7 +140,7 @@ async def add_experience(user, exp, message):
 
 async def level_up(user, message, msg):
 
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["users"]
     result = col.find_one({'guild_id':f'{msg}', 'user_id': f'{user.id}'})
@@ -161,7 +161,7 @@ async def level_up(user, message, msg):
 async def leaderboard(ctx):
     guild_id = ctx.guild.id
     guild = client.get_guild(guild_id)
-    cluster = MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster = MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db = cluster["xp_system"]
     col = db["users"]
     result = col.find({'guild_id':f'{guild_id}'}).sort('exp',-1).limit(10)
@@ -185,7 +185,7 @@ async def rank(ctx, member: discord.Member = None):
 
     if member is None:
 
-        cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+        cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
         db=cluster["xp_system"]
         col=db["users"]
         id_1 = ctx.message.author.id
@@ -242,7 +242,7 @@ async def rank(ctx, member: discord.Member = None):
         
     else:
 
-        cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+        cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
         db=cluster["xp_system"]
         col=db["users"]
         id_1 = member.id
@@ -307,7 +307,7 @@ async def on_command_error(ctx, error):
 @client.command()
 async def help(ctx):
     
-    cluster=MongoClient("mongodb+srv://max:discordboobotdb@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
+    cluster=MongoClient("mongodb+srv://max:8AeoNM3biqRI4gTF@newdb.sv6qv.mongodb.net/xp_system?retryWrites=true&w=majority")
     db=cluster["xp_system"]
     col=db["prefixes"]
     result=col.find_one({'guild_id':f'{ctx.guild.id}'})
